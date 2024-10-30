@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'models/medication.dart';
 
 void main() {
   runApp(const MainApp());
@@ -57,5 +58,20 @@ class MainAppDrawer extends StatelessWidget {
         ],
       ),
     );
+  }
+}
+
+class MedicationEntry extends StatelessWidget {
+  const MedicationEntry({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      appBar: AppBar(
+        title: const Text('Entry'),
+        ),
+        body: Center(
+          child:
+        ))
   }
 }
