@@ -31,6 +31,14 @@ class Pill extends Medication {
 
   Pill(super.name, super.frequency, super.unit, this.dose);
 
+  String getUnit() {
+    return unit.toString().split('.').last;
+  }
+
+  String getFreq() {
+    return frequency.toString().split('.').last;
+  }
+
   @override
   Map<String, dynamic> toJSON() => {
     'type' : 'pill',
@@ -38,6 +46,8 @@ class Pill extends Medication {
     'dose' : dose,
   };
   
+  @override
+  String toString() => '$name - {$getUnit()}';
 }
 
 class Liquid extends Medication {

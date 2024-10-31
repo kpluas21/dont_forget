@@ -30,7 +30,7 @@ class MainApp extends StatelessWidget {
             );
           },
         ),
-        
+
         appBar: AppBar(
           title: const Text("Don't Forget"),
         ),
@@ -88,8 +88,24 @@ class MainAppDrawer extends StatelessWidget {
 }
 
 //The page for entering a new medication
-class MedicationEntry extends StatelessWidget {
+class MedicationEntry extends StatefulWidget {
   const MedicationEntry({super.key});
+
+  @override
+  State<MedicationEntry> createState() => _MedicationEntryState();
+}
+
+class _MedicationEntryState extends State<MedicationEntry> {
+  final GlobalKey<FormState> _formKey = GlobalKey<FormState>();
+  String _name = '';
+  String _dose = '';
+
+  void _submitForm() {
+    if (_formKey.currentState!.validate()) {
+      _formKey.currentState!.save();
+      print('Name: $_name, Dose: $_dose');
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -97,8 +113,46 @@ class MedicationEntry extends StatelessWidget {
       appBar: AppBar(
         title: const Text('Entry'),
       ),
-      body: const Center(
-        child: Text('Medication Entry'),
+      body: Form(
+        key: _formKey,
+        child: Padding(
+          padding: const EdgeInsets.all(16.0),
+          child: Column(
+            children: <Widget>[
+              TextFormField(
+                decoration: const InputDecoration(labelText: 'Name'),
+                validator: (value) {
+                  if (value!.isEmpty) {
+                    return 'Please enter a name';
+                  }
+                  return null;
+                },
+                onSaved: (value) {
+                  _name = value!;
+                },
+              ),
+              TextFormField(
+                decoration: const InputDecoration(labelText: 'Dose'),
+                validator: (value) {
+                  if (value!.isEmpty) {
+                    return 'Please enter a dose';
+                  }
+                  return null;
+                },
+                onSaved: (value) {
+                  _dose = value!;
+                },
+              ),
+              const SizedBox(
+                height: 20.0,
+              ),
+              ElevatedButton(
+                onPressed: _submitForm,
+                child: const Text('Submit'),
+              ),
+            ],
+          ),
+        ),
       ),
       drawer: const MainAppDrawer(),
     );
