@@ -1,3 +1,4 @@
+import 'package:shared_preferences/shared_preferences.dart';
 import 'dart:convert';
 
 enum Frequency {
@@ -21,15 +22,15 @@ abstract class Medication {
   String name;
   Frequency frequency;
   MeasurementUnit unit;
+  double dose;
 
-  Medication(this.name, this.frequency, this.unit);
+  Medication(this.name, this.frequency, this.unit, this.dose);
   Map<String, dynamic> toJSON();
 }
 
 class Pill extends Medication {
-  int dose;
 
-  Pill(super.name, super.frequency, super.unit, this.dose);
+  Pill(super.name, super.frequency, super.unit, super.dose);
 
   String getUnit() {
     return unit.toString().split('.').last;
@@ -44,6 +45,7 @@ class Pill extends Medication {
     'type' : 'pill',
     'name' : name,
     'dose' : dose,
+    'unit' : unit.toString().split('.').last,
   };
   
   @override
@@ -51,14 +53,35 @@ class Pill extends Medication {
 }
 
 class Liquid extends Medication {
-  double volume;
 
-  Liquid(super.name, super.frequency, super.unit, this.volume);
+  Liquid(super.name, super.frequency, super.unit, super.dose);
 
   @override
   Map<String, dynamic> toJSON() => {
     'type' : 'liquid',
     'name' : name,
-    'volume' : volume,
+    'dose' : dose,
+    'unit' : unit.toString().split('.').last,
   };
+}
+
+//Saves medications to local storage
+Future<void> saveMedications(List<Medication> medications) async {
+  SharedPreferences prefs = await SharedPreferences.getInstance();
+  List<String> medsJson = medications.map((med) => med.toJSON().toString()).toList();
+  await prefs.setStringList('medications', medsJson);
+}
+
+//Loads medications from local storage
+Future<List<Medication>> loadMedications() async {
+  SharedPreferences prefs = await SharedPreferences.getInstance();
+  List<String> medsJson = prefs.getStringList('medications') ?? [];
+  return medsJson.map((medJson) {
+    Map<String, dynamic> medMap = jsonDecode(medJson);
+    if (medMap['type'] == 'pill') {
+      return Pill(medMap['name'], Frequency.daily, MeasurementUnit.mg, medMap['dose']);
+    } else {
+      return Liquid(medMap['name'], Frequency.daily, MeasurementUnit.mL, medMap['dose']);
+    }
+  }).toList();
 }
