@@ -8,6 +8,7 @@ enum Frequency {
   monthly,
   quarterly,
   yearly,
+  asNeeded,
 }
 
 enum MeasurementUnit {
@@ -18,51 +19,40 @@ enum MeasurementUnit {
   oz,
 }
 
-abstract class Medication {
-  String name;
+enum MedicationType {
+  capsule,
+  tablet,
+  patch,
+  gummy,
+  liquid,
+  injection,
+  suppository,
+}
+
+class Medication {
+  MedicationType type;
   Frequency frequency;
   MeasurementUnit unit;
+
+  String name;
   double dose;
+  int count = 1;
 
-  Medication(this.name, this.frequency, this.unit, this.dose);
-  Map<String, dynamic> toJSON();
-}
+  String get typeString => type.toString().split('.').last;
+  String get frequencyString => frequency.toString().split('.').last;
+  String get unitString => unit.toString().split('.').last;
 
-class Pill extends Medication {
-
-  Pill(super.name, super.frequency, super.unit, super.dose);
-
-  String getUnit() {
-    return unit.toString().split('.').last;
+  Medication(this.type, this.name, this.frequency, this.unit, this.dose, this.count);
+  Map<String, dynamic> toJSON() {
+    return {
+      'type': typeString,
+      'name': name,
+      'frequency': frequencyString,
+      'unit': unitString,
+      'dose': dose,
+      'count': count,
+    };
   }
-
-  String getFreq() {
-    return frequency.toString().split('.').last;
-  }
-
-  @override
-  Map<String, dynamic> toJSON() => {
-    'type' : 'pill',
-    'name' : name,
-    'dose' : dose,
-    'unit' : unit.toString().split('.').last,
-  };
-  
-  @override
-  String toString() => '$name - {$getUnit()}';
-}
-
-class Liquid extends Medication {
-
-  Liquid(super.name, super.frequency, super.unit, super.dose);
-
-  @override
-  Map<String, dynamic> toJSON() => {
-    'type' : 'liquid',
-    'name' : name,
-    'dose' : dose,
-    'unit' : unit.toString().split('.').last,
-  };
 }
 
 //Saves medications to local storage
@@ -78,10 +68,13 @@ Future<List<Medication>> loadMedications() async {
   List<String> medsJson = prefs.getStringList('medications') ?? [];
   return medsJson.map((medJson) {
     Map<String, dynamic> medMap = jsonDecode(medJson);
-    if (medMap['type'] == 'pill') {
-      return Pill(medMap['name'], Frequency.daily, MeasurementUnit.mg, medMap['dose']);
-    } else {
-      return Liquid(medMap['name'], Frequency.daily, MeasurementUnit.mL, medMap['dose']);
-    }
+    return Medication(
+      MedicationType.values.firstWhere((type) => type.toString().split('.').last == medMap['type']),
+      medMap['name'],
+      Frequency.values.firstWhere((freq) => freq.toString().split('.').last == medMap['frequency']),
+      MeasurementUnit.values.firstWhere((unit) => unit.toString().split('.').last == medMap['unit']),
+      medMap['dose'],
+      medMap['count'],
+    );
   }).toList();
 }

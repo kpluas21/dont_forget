@@ -2,35 +2,45 @@ import '../models/medication.dart';
 
 List<Medication> getMockMedications() {
   return [
-    Pill(
+    Medication(
+      MedicationType.tablet,
       'Aspirin',
       Frequency.daily,
       MeasurementUnit.mg,
       325,
+      1
     ),
-    Pill(
+    Medication(
+      MedicationType.tablet,
       'Lisinopril',
       Frequency.monthly,
       MeasurementUnit.mg,
       10,
+      1
     ),
-    Pill(
+    Medication(
+      MedicationType.tablet,
       'Atorvastatin',
       Frequency.quarterly,
       MeasurementUnit.mg,
       20,
+      1
     ),
-    Liquid(
+    Medication(
+      MedicationType.liquid,
       'Lantus',
       Frequency.biweekly,
       MeasurementUnit.mL,
       10,
+      1
     ),
-    Liquid(
+    Medication(
+      MedicationType.injection,
       'Humalog',
       Frequency.weekly,
       MeasurementUnit.mL,
       5,
+      1
     ),
   ];
 }

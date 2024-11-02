@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'models/medication.dart';
 import 'mock/mock_medications.dart';
 
@@ -9,6 +10,24 @@ final List<Frequency> frequencies = [
   Frequency.monthly,
   Frequency.quarterly,
   Frequency.yearly,
+];
+
+final List<MeasurementUnit> units = [
+  MeasurementUnit.mg,
+  MeasurementUnit.g,
+  MeasurementUnit.mL,
+  MeasurementUnit.L,
+  MeasurementUnit.oz,
+];
+
+final List<MedicationType> types = [
+  MedicationType.capsule,
+  MedicationType.tablet,
+  MedicationType.patch,
+  MedicationType.gummy,
+  MedicationType.liquid,
+  MedicationType.injection,
+  MedicationType.suppository,
 ];
 
 void main() {
@@ -119,15 +138,26 @@ class MedicationEntry extends StatefulWidget {
 
 class _MedicationEntryState extends State<MedicationEntry> {
   final GlobalKey<FormState> _formKey = GlobalKey<FormState>();
+  late Medication newMed;
+
   String _name = '';
   String _dose = '';
 
-  Frequency dropdownValue = frequencies[0];
+  MedicationType typeValue = types[0];
+  Frequency frequencyValue = frequencies[0];
+  MeasurementUnit unitValue = units[0];
 
   void _submitForm() {
     if (_formKey.currentState!.validate()) {
       _formKey.currentState!.save();
-      print('Name: $_name, Dose: $_dose');
+      newMed = Medication(
+        typeValue,
+        _name,
+        frequencyValue,
+        unitValue,
+        double.parse(_dose),
+        1,
+      );
     }
   }
 
@@ -163,6 +193,10 @@ class _MedicationEntryState extends State<MedicationEntry> {
             ),
             TextFormField(
               decoration: const InputDecoration(labelText: 'Dose'),
+              keyboardType: TextInputType.number,
+              inputFormatters: <TextInputFormatter>[
+                FilteringTextInputFormatter.digitsOnly
+              ],
               validator: (value) {
                 if (value!.isEmpty) {
                   return 'Please enter a dose';
@@ -173,19 +207,53 @@ class _MedicationEntryState extends State<MedicationEntry> {
                 _dose = value!;
               },
             ),
-            DropdownButton<Frequency>(
-              value: dropdownValue,
-              onChanged: (Frequency? value) {
-                setState(() {
-                  dropdownValue = value!;
-                });
-              },
-              items: frequencies
-                  .map((Frequency freq) => DropdownMenuItem<Frequency>(
-                        value: freq,
-                        child: Text(freq.toString().split('.').last),
-                      ))
-                  .toList(),
+            Row(
+              children: [
+                Padding(padding: const EdgeInsets.all(16.0)),
+                DropdownButton<MeasurementUnit>(
+                  value: unitValue,
+                  onChanged: (MeasurementUnit? value) {
+                    setState(() {
+                      unitValue = value!;
+                    });
+                  },
+                  items: MeasurementUnit.values
+                      .map((MeasurementUnit unit) =>
+                          DropdownMenuItem<MeasurementUnit>(
+                            value: unit,
+                            child: Text(unit.toString().split('.').last),
+                          ))
+                      .toList(),
+                ),
+                DropdownButton<Frequency>(
+                  value: frequencyValue,
+                  onChanged: (Frequency? value) {
+                    setState(() {
+                      frequencyValue = value!;
+                    });
+                  },
+                  items: frequencies
+                      .map((Frequency freq) => DropdownMenuItem<Frequency>(
+                            value: freq,
+                            child: Text(freq.toString().split('.').last),
+                          ))
+                      .toList(),
+                ),
+                DropdownButton(
+                  value: typeValue,
+                  onChanged: (MedicationType? value) {
+                    setState(() {
+                      typeValue = value!;
+                    });
+                  },
+                  items: types
+                      .map((MedicationType type) => DropdownMenuItem(
+                            value: type,
+                            child: Text(type.toString().split('.').last),
+                          ))
+                      .toList(),
+                ),
+              ],
             ),
             const SizedBox(
               height: 20.0,
