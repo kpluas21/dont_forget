@@ -3,80 +3,92 @@ import 'package:flutter/services.dart';
 import 'models/medication.dart';
 import 'mock/mock_medications.dart';
 
-final List<Frequency> frequencies = [
-  Frequency.daily,
-  Frequency.weekly,
-  Frequency.biweekly,
-  Frequency.monthly,
-  Frequency.quarterly,
-  Frequency.yearly,
-];
+//Lists of possible values for medication properties
+final List<Frequency> frequencies = Frequency.values;
+final List<MeasurementUnit> units = MeasurementUnit.values;
+final List<MedicationType> types = MedicationType.values;
 
-final List<MeasurementUnit> units = [
-  MeasurementUnit.mg,
-  MeasurementUnit.g,
-  MeasurementUnit.mL,
-  MeasurementUnit.L,
-  MeasurementUnit.oz,
-];
-
-final List<MedicationType> types = [
-  MedicationType.capsule,
-  MedicationType.tablet,
-  MedicationType.patch,
-  MedicationType.gummy,
-  MedicationType.liquid,
-  MedicationType.injection,
-  MedicationType.suppository,
-];
+final MedicationProvider medMgr = MedicationProvider();
 
 void main() {
   runApp(const MainApp());
 }
 
-//The main app that displays a list of medications
 class MainApp extends StatelessWidget {
   const MainApp({super.key});
 
   @override
   Widget build(BuildContext context) {
-    // Get a mock list of medications
-    List<Medication> medications = getMockMedications();
-    medications += medications;
-    medications += medications;
+    return HomePage();
+  }
+}
 
+//The main app that displays a list of medications
+class HomePage extends StatefulWidget {
+  const HomePage({super.key});
+
+  @override
+  State<HomePage> createState() => _HomePageState();
+}
+
+class _HomePageState extends State<HomePage> {
+  void _addMedication(Medication newMed) {
+    setState(() {
+      medMgr.addMedication(newMed);
+    });
+  }
+
+  @override
+  Widget build(BuildContext context) {
     return MaterialApp(
       theme: ThemeData(
         colorScheme: ColorScheme.fromSeed(
             seedColor: Colors.purple, brightness: Brightness.light),
       ),
-      home: Scaffold(
-        // Display the list of medications
-        body: ListView.builder(
-          itemCount: medications.length,
-          itemBuilder: (context, index) {
-            final med = medications[index];
-            return ListTile(
-              onLongPress: () {
-                print('Long press on ${med.name}');
-              },
-              leading: Padding(
-                  padding: const EdgeInsets.all(12.0),
-                  child: const Icon(Icons.medication)),
-              title: Text(
-                  '${med.name} - ${med.dose} ${med.unit.toString().split('.').last}'),
-              subtitle:
-                  Text(medications[index].frequency.toString().split('.').last),
-            );
-          },
-        ),
+      home: Builder(builder: (context) {
+        return Scaffold(
+          floatingActionButton: FloatingActionButton(
+            onPressed: () {
+              Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                      builder: (context) => MedicationEntry(onAdd: (newMed) {
+                            _addMedication(newMed);
+                          })));
+            },
+            child: const Icon(Icons.add),
+          ),
+          // Display the list of medications
+          body: ListView.builder(
+            itemCount: medMgr.medications.length,
+            itemBuilder: (context, index) {
+              final med = medMgr.medications[index];
+              // Display a ListTile for each medication
+              return ListTile(
+                onLongPress: () {
+                  print('Long press on ${med.name}');
+                },
+                leading: Padding(
+                    padding: const EdgeInsets.all(12.0),
+                    child: const Icon(Icons.medication)),
+                title: Text(
+                    '${med.name} - ${med.dose} ${med.unit.toString().split('.').last}'),
+                subtitle: Text(medMgr.medications[index].frequency
+                    .toString()
+                    .split('.')
+                    .last),
+              );
+            },
+          ),
 
-        appBar: AppBar(
-          backgroundColor: const Color.fromARGB(255, 176, 121, 187),
-          title: const Text("Don't Forget"),
-        ),
-        drawer: const MainAppDrawer(),
-      ),
+          appBar: AppBar(
+            backgroundColor: const Color.fromARGB(255, 176, 121, 187),
+            title: const Text("Don't Forget"),
+          ),
+          // Add the main drawer to the Scaffold
+          drawer: const MainAppDrawer(),
+        );
+      }),
     );
   }
 }
@@ -102,19 +114,9 @@ class MainAppDrawer extends StatelessWidget {
           ListTile(
             title: const Text('Medication List'),
             onTap: () {
-              Navigator.push(
+              Navigator.pushReplacement(
                 context,
-                MaterialPageRoute(builder: (context) => const MainApp()),
-              );
-            },
-          ),
-          ListTile(
-            title: const Text('Add New Medication'),
-            onTap: () {
-              Navigator.push(
-                context,
-                MaterialPageRoute(
-                    builder: (context) => const MedicationEntry()),
+                MaterialPageRoute(builder: (context) => const HomePage()),
               );
             },
           ),
@@ -130,12 +132,15 @@ class MainAppDrawer extends StatelessWidget {
 
 //The page for entering a new medication
 class MedicationEntry extends StatefulWidget {
-  const MedicationEntry({super.key});
+  const MedicationEntry({super.key, required this.onAdd});
+
+  final Function(Medication) onAdd;
 
   @override
   State<MedicationEntry> createState() => _MedicationEntryState();
 }
 
+// The state for the MedicationEntry widget
 class _MedicationEntryState extends State<MedicationEntry> {
   final GlobalKey<FormState> _formKey = GlobalKey<FormState>();
   late Medication newMed;
@@ -150,6 +155,7 @@ class _MedicationEntryState extends State<MedicationEntry> {
   void _submitForm() {
     if (_formKey.currentState!.validate()) {
       _formKey.currentState!.save();
+
       newMed = Medication(
         typeValue,
         _name,
@@ -158,6 +164,16 @@ class _MedicationEntryState extends State<MedicationEntry> {
         double.parse(_dose),
         1,
       );
+
+      print(newMed.toString());
+      saveMedications(medMgr.medications);
+
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('Medication added')),
+      );
+
+      widget.onAdd(newMed);
+      Navigator.pop(context);
     }
   }
 
@@ -210,6 +226,7 @@ class _MedicationEntryState extends State<MedicationEntry> {
             Row(
               children: [
                 Padding(padding: const EdgeInsets.all(16.0)),
+                // Unit dropdown
                 DropdownButton<MeasurementUnit>(
                   value: unitValue,
                   onChanged: (MeasurementUnit? value) {
@@ -225,6 +242,7 @@ class _MedicationEntryState extends State<MedicationEntry> {
                           ))
                       .toList(),
                 ),
+                // Frequency dropdown
                 DropdownButton<Frequency>(
                   value: frequencyValue,
                   onChanged: (Frequency? value) {
@@ -239,6 +257,7 @@ class _MedicationEntryState extends State<MedicationEntry> {
                           ))
                       .toList(),
                 ),
+                // Type dropdown
                 DropdownButton(
                   value: typeValue,
                   onChanged: (MedicationType? value) {

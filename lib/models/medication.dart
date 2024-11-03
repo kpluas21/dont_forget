@@ -1,5 +1,7 @@
+import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'dart:convert';
+import '../mock/mock_medications.dart';
 
 enum Frequency {
   daily,
@@ -43,6 +45,12 @@ class Medication {
   String get unitString => unit.toString().split('.').last;
 
   Medication(this.type, this.name, this.frequency, this.unit, this.dose, this.count);
+  
+  @override
+  String toString() {
+    return '$name($typeString) - $count of $dose $unitString taken $frequencyString';
+  }
+  
   Map<String, dynamic> toJSON() {
     return {
       'type': typeString,
@@ -77,4 +85,31 @@ Future<List<Medication>> loadMedications() async {
       medMap['count'],
     );
   }).toList();
+}
+
+//Helps manage the list of medications
+class MedicationProvider with ChangeNotifier {
+  final List<Medication> _medications = [];
+  List<Medication> get medications => _medications;
+
+
+
+  void addMedication(Medication medication) {
+    debugPrint('Adding medication: $medication');
+    _medications.add(medication);
+    assert (_medications.contains(medication));
+    notifyListeners();
+  }
+
+  void removeMedication(Medication medication) {
+    debugPrint('Removing medication: $medication');
+    _medications.remove(medication);
+    notifyListeners();
+  }
+
+  void listMedications() {
+    for (var med in _medications) {
+      debugPrint(med.toString());
+    }
+  }
 }
