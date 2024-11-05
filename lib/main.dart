@@ -1,8 +1,7 @@
+import 'package:dont_forget/main_app_drawer.dart';
 import 'package:dont_forget/medication_entry.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
 import 'models/medication.dart';
-import 'mock/mock_medications.dart';
 
 //Lists of possible values for medication properties
 final List<Frequency> frequencies = Frequency.values;
@@ -39,6 +38,8 @@ class _HomePageState extends State<HomePage> {
     // Load the list of medications from local storage
     loadMedications().then((medications) {
       setState(() {
+        medMgr.medications
+            .clear(); // Clear the existing list before adding new medications
         medMgr.medications.addAll(medications);
       });
     });
@@ -101,43 +102,6 @@ class _HomePageState extends State<HomePage> {
           drawer: const MainAppDrawer(),
         );
       }),
-    );
-  }
-}
-
-//The main drawer for this app that persists throughout pages
-class MainAppDrawer extends StatelessWidget {
-  const MainAppDrawer({
-    super.key,
-  });
-
-  @override
-  Widget build(BuildContext context) {
-    return Drawer(
-      child: ListView(
-        padding: EdgeInsets.zero,
-        children: [
-          const DrawerHeader(
-            decoration: BoxDecoration(
-              color: Colors.blue,
-            ),
-            child: Text('Menu'),
-          ),
-          ListTile(
-            title: const Text('Medication List'),
-            onTap: () {
-              Navigator.pushReplacement(
-                context,
-                MaterialPageRoute(builder: (context) => const HomePage()),
-              );
-            },
-          ),
-          ListTile(
-            title: const Text('Settings'),
-            onTap: () {},
-          ),
-        ],
-      ),
     );
   }
 }
