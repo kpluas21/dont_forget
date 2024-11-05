@@ -4,6 +4,7 @@ import 'package:dont_forget/util/confirm_dialog.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'models/medication.dart';
+import 'util/notifications.dart';
 
 //Lists of possible values for medication properties
 final List<Frequency> frequencies = Frequency.values;
@@ -12,10 +13,17 @@ final List<MedicationType> types = MedicationType.values;
 
 final MedicationProvider medMgr = MedicationProvider();
 
-void main() {
+//TODO: Implement reminder notifications
+
+void main() async {
+  // Initialize the local notification service
+  await LocalNotificationService().init();
+
+  // Run the app
   runApp(const MainApp());
 }
 
+// The main app widget
 class MainApp extends StatelessWidget {
   const MainApp({super.key});
 
@@ -25,7 +33,7 @@ class MainApp extends StatelessWidget {
   }
 }
 
-//The main app that displays a list of medications
+// The home page widget
 class HomePage extends StatefulWidget {
   const HomePage({super.key});
 
@@ -47,13 +55,15 @@ class _HomePageState extends State<HomePage> {
       });
     });
   }
-
+  
+  // Add a new medication to the list
   void _addMedication(Medication newMed) {
     setState(() {
       medMgr.addMedication(newMed);
     });
   }
 
+  // Update an existing medication in the list
   void _updateMedication(Medication existingMed, Medication newMed) {
     setState(() {
       medMgr.updateMedication(existingMed, newMed);
@@ -69,6 +79,7 @@ class _HomePageState extends State<HomePage> {
       ),
       home: Builder(builder: (context) {
         return Scaffold(
+          // Add a floating action button to add a new medication
           floatingActionButton: FloatingActionButton(
             onPressed: () {
               Navigator.push(
