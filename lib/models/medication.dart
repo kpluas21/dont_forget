@@ -105,14 +105,20 @@ class MedicationProvider with ChangeNotifier {
 
   void addMedication(Medication medication) {
     debugPrint('Adding medication: $medication');
+
     _medications.add(medication);
+    saveMedications(medications);
+
     assert(_medications.contains(medication));
+
     notifyListeners();
   }
 
   void removeMedication(Medication medication) {
     debugPrint('Removing medication: $medication');
+
     _medications.remove(medication);
+    saveMedications(medications);
     notifyListeners();
   }
 

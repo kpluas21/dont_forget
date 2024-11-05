@@ -1,10 +1,15 @@
 import 'package:dont_forget/main.dart';
+import 'package:dont_forget/main_app_drawer.dart';
 import 'package:dont_forget/models/medication.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:dont_forget/util/confirm_dialog.dart';
 
 class MedicationEntry extends StatefulWidget {
-  const MedicationEntry({super.key, required this.onAdd});
+  final Medication? existingMed;
+
+  const MedicationEntry({super.key, this.existingMed, required this.onAdd});
 
   final Function(Medication) onAdd;
 
@@ -15,36 +20,71 @@ class MedicationEntry extends StatefulWidget {
 // The state for the MedicationEntry widget
 class _MedicationEntryState extends State<MedicationEntry> {
   final GlobalKey<FormState> _formKey = GlobalKey<FormState>();
+
   late Medication newMed;
 
   String _name = '';
   String _dose = '';
+  String _count = '1';
 
-  MedicationType typeValue = types[0];
-  Frequency frequencyValue = frequencies[0];
-  MeasurementUnit unitValue = units[0];
+  late MedicationType typeValue;
+  late Frequency frequencyValue;
+  late MeasurementUnit unitValue;
+
+  // Initialize the form with the existing medication values if they exist
+  @override
+  void initState() {
+    super.initState();
+    if (widget.existingMed != null) {
+      typeValue = widget.existingMed!.type;
+      frequencyValue = widget.existingMed!.frequency;
+      unitValue = widget.existingMed!.unit;
+      _name = widget.existingMed!.name;
+      _dose = widget.existingMed!.dose.toString();
+      _count = widget.existingMed!.count.toString();
+    } else {
+      //Establish default values
+      typeValue = types[0];
+      frequencyValue = frequencies[0];
+      unitValue = units[0];
+    }
+  }
 
   void _submitForm() {
     if (_formKey.currentState!.validate()) {
       _formKey.currentState!.save();
 
+      if (widget.existingMed != null) {
+        widget.existingMed!.name = _name;
+        widget.existingMed!.dose = double.parse(_dose);
+        widget.existingMed!.count = int.parse(_count);
+        widget.existingMed!.type = typeValue;
+        widget.existingMed!.frequency = frequencyValue;
+        widget.existingMed!.unit = unitValue;
+
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(content: Text('Medication updated')),
+        );
+        Navigator.pop(context);
+      }
       newMed = Medication(
         typeValue,
         _name,
         frequencyValue,
         unitValue,
         double.parse(_dose),
-        1,
+        int.parse(_count),
       );
 
-      print(newMed.toString());
-      saveMedications(medMgr.medications);
+      if (kDebugMode) {
+        print(newMed.toString());
+      }
 
+      widget.onAdd(newMed);
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(content: Text('Medication added')),
       );
 
-      widget.onAdd(newMed);
       Navigator.pop(context);
     }
   }
@@ -79,21 +119,45 @@ class _MedicationEntryState extends State<MedicationEntry> {
                 _name = value!;
               },
             ),
-            TextFormField(
-              decoration: const InputDecoration(labelText: 'Dose'),
-              keyboardType: TextInputType.number,
-              inputFormatters: <TextInputFormatter>[
-                FilteringTextInputFormatter.digitsOnly
+            Row(
+              children: [
+                Expanded(
+                  child: TextFormField(
+                    decoration: const InputDecoration(labelText: 'Dose'),
+                    keyboardType: TextInputType.number,
+                    inputFormatters: <TextInputFormatter>[
+                      FilteringTextInputFormatter.digitsOnly
+                    ],
+                    validator: (value) {
+                      if (value!.isEmpty) {
+                        return 'Please enter a dose';
+                      }
+                      return null;
+                    },
+                    onSaved: (value) {
+                      _dose = value!;
+                    },
+                  ),
+                ),
+                Expanded(
+                  child: TextFormField(
+                    decoration: const InputDecoration(labelText: 'Count'),
+                    keyboardType: TextInputType.number,
+                    inputFormatters: <TextInputFormatter>[
+                      FilteringTextInputFormatter.digitsOnly
+                    ],
+                    validator: (value) {
+                      if (value!.isEmpty) {
+                        return 'Please enter a count';
+                      }
+                      return null;
+                    },
+                    onSaved: (value) {
+                      _count = value!;
+                    },
+                  ),
+                ),
               ],
-              validator: (value) {
-                if (value!.isEmpty) {
-                  return 'Please enter a dose';
-                }
-                return null;
-              },
-              onSaved: (value) {
-                _dose = value!;
-              },
             ),
             Row(
               children: [
@@ -150,7 +214,10 @@ class _MedicationEntryState extends State<MedicationEntry> {
               height: 20.0,
             ),
             ElevatedButton(
-              onPressed: _submitForm,
+              onPressed: () {
+                showConfirmDialog(
+                    context, _submitForm, 'Are you sure you want to submit?');
+              },
               child: const Text('Submit'),
             ),
           ],

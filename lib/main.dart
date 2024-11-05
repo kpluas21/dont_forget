@@ -1,5 +1,7 @@
 import 'package:dont_forget/main_app_drawer.dart';
 import 'package:dont_forget/medication_entry.dart';
+import 'package:dont_forget/util/confirm_dialog.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'models/medication.dart';
 
@@ -79,13 +81,16 @@ class _HomePageState extends State<HomePage> {
               // Display a ListTile for each medication
               return ListTile(
                 onLongPress: () {
-                  print('Long press on ${med.name}');
+                  if (kDebugMode) {
+                    print('Long press on ${med.name}');
+                  }
+                  longTapMenu(context, index);
                 },
                 leading: Padding(
                     padding: const EdgeInsets.all(12.0),
                     child: const Icon(Icons.medication)),
                 title: Text(
-                    '${med.name} - ${med.dose} ${med.unit.toString().split('.').last}'),
+                    '${med.count} x ${med.name} - ${med.dose} ${med.unit.toString().split('.').last}'),
                 subtitle: Text(medMgr.medications[index].frequency
                     .toString()
                     .split('.')
@@ -103,5 +108,48 @@ class _HomePageState extends State<HomePage> {
         );
       }),
     );
+  }
+
+  Future<dynamic> longTapMenu(BuildContext context, int index) {
+    return showMenu(
+        context: context,
+        position: RelativeRect.fromLTRB(100, 100, 100, 100),
+        items: [
+          PopupMenuItem(
+            child: ListTile(
+              leading: const Icon(Icons.edit),
+              title: const Text('Edit'),
+              onTap: () {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                    builder: (context) => MedicationEntry(
+                      existingMed: medMgr.medications[index],
+                      onAdd: (newMed) {
+                        setState(() {
+                          medMgr.medications[index] = newMed;
+                        });
+                      },
+                    ),
+                  ),
+                );
+              },
+            ),
+          ),
+          PopupMenuItem(
+            child: ListTile(
+              leading: const Icon(Icons.delete),
+              title: const Text('Delete'),
+              onTap: () {
+                showConfirmDialog(context, () {
+                  setState(() {
+                    medMgr.removeMedication(medMgr.medications[index]);
+                    Navigator.pop(context);
+                  });
+                }, 'Are you sure you want to delete this medication?');
+              },
+            ),
+          ),
+        ]);
   }
 }
