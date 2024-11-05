@@ -37,6 +37,7 @@ class _HomePageState extends State<HomePage> {
   @override
   void initState() {
     super.initState();
+
     // Load the list of medications from local storage
     loadMedications().then((medications) {
       setState(() {
@@ -50,6 +51,12 @@ class _HomePageState extends State<HomePage> {
   void _addMedication(Medication newMed) {
     setState(() {
       medMgr.addMedication(newMed);
+    });
+  }
+
+  void _updateMedication(Medication existingMed, Medication newMed) {
+    setState(() {
+      medMgr.updateMedication(existingMed, newMed);
     });
   }
 
@@ -69,6 +76,8 @@ class _HomePageState extends State<HomePage> {
                   MaterialPageRoute(
                       builder: (context) => MedicationEntry(onAdd: (newMed) {
                             _addMedication(newMed);
+                          }, onUpdate: (oldMed, newMed) {
+                            _updateMedication(oldMed, newMed);
                           })));
             },
             child: const Icon(Icons.add),
@@ -128,6 +137,12 @@ class _HomePageState extends State<HomePage> {
                       onAdd: (newMed) {
                         setState(() {
                           medMgr.medications[index] = newMed;
+                        });
+                      },
+                      onUpdate: (oldMed, newMed) {
+                        setState(() {
+                          medMgr.updateMedication(oldMed, newMed);
+                          Navigator.pop(context);
                         });
                       },
                     ),

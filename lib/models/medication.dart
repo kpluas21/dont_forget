@@ -89,11 +89,15 @@ Future<void> saveMedications(List<Medication> medications) async {
 Future<List<Medication>> loadMedications() async {
   SharedPreferences prefs = await SharedPreferences.getInstance();
   List<String>? jsonList = prefs.getStringList('medications');
-  if (jsonList != null) {
-    return jsonList.map((jsonString) {
-      Map<String, dynamic> jsonMap = jsonDecode(jsonString);
-      return Medication.fromJSON(jsonMap);
-    }).toList();
+  try {
+    if (jsonList != null) {
+      return jsonList.map((jsonString) {
+        Map<String, dynamic> jsonMap = jsonDecode(jsonString);
+        return Medication.fromJSON(jsonMap);
+      }).toList();
+    }
+  } on FormatException catch (e) {
+    debugPrint('Error loading medications: $e');
   }
   return [];
 }
@@ -118,6 +122,15 @@ class MedicationProvider with ChangeNotifier {
     debugPrint('Removing medication: $medication');
 
     _medications.remove(medication);
+    saveMedications(medications);
+    notifyListeners();
+  }
+
+  void updateMedication(Medication oldMed, Medication newMed) {
+    debugPrint('Updating medication: $oldMed to $newMed');
+
+    final index = _medications.indexOf(oldMed);
+    _medications[index] = newMed;
     saveMedications(medications);
     notifyListeners();
   }

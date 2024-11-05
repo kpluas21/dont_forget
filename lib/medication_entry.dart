@@ -9,9 +9,15 @@ import 'package:dont_forget/util/confirm_dialog.dart';
 class MedicationEntry extends StatefulWidget {
   final Medication? existingMed;
 
-  const MedicationEntry({super.key, this.existingMed, required this.onAdd});
+  const MedicationEntry({
+    super.key,
+    this.existingMed,
+    required this.onAdd,
+    required this.onUpdate,
+  });
 
   final Function(Medication) onAdd;
+  final Function(Medication, Medication) onUpdate;
 
   @override
   State<MedicationEntry> createState() => _MedicationEntryState();
@@ -21,12 +27,13 @@ class MedicationEntry extends StatefulWidget {
 class _MedicationEntryState extends State<MedicationEntry> {
   final GlobalKey<FormState> _formKey = GlobalKey<FormState>();
 
+  // The new medication object to be created
   late Medication newMed;
 
+  //The variables to hold the form values
   String _name = '';
   String _dose = '';
   String _count = '1';
-
   late MedicationType typeValue;
   late Frequency frequencyValue;
   late MeasurementUnit unitValue;
@@ -35,6 +42,7 @@ class _MedicationEntryState extends State<MedicationEntry> {
   @override
   void initState() {
     super.initState();
+    // If an existing medication is passed in, set the form values to the existing values
     if (widget.existingMed != null) {
       typeValue = widget.existingMed!.type;
       frequencyValue = widget.existingMed!.frequency;
@@ -55,37 +63,42 @@ class _MedicationEntryState extends State<MedicationEntry> {
       _formKey.currentState!.save();
 
       if (widget.existingMed != null) {
-        widget.existingMed!.name = _name;
-        widget.existingMed!.dose = double.parse(_dose);
-        widget.existingMed!.count = int.parse(_count);
-        widget.existingMed!.type = typeValue;
-        widget.existingMed!.frequency = frequencyValue;
-        widget.existingMed!.unit = unitValue;
+        newMed = Medication(
+          typeValue,
+          _name,
+          frequencyValue,
+          unitValue,
+          double.parse(_dose),
+          int.parse(_count),
+        );
+
+        widget.onUpdate(widget.existingMed!, newMed);
 
         ScaffoldMessenger.of(context).showSnackBar(
           const SnackBar(content: Text('Medication updated')),
         );
         Navigator.pop(context);
+      } else {
+        newMed = Medication(
+          typeValue,
+          _name,
+          frequencyValue,
+          unitValue,
+          double.parse(_dose),
+          int.parse(_count),
+        );
+
+        if (kDebugMode) {
+          print(newMed.toString());
+        }
+
+        widget.onAdd(newMed);
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(content: Text('Medication added')),
+        );
+
+        Navigator.pop(context);
       }
-      newMed = Medication(
-        typeValue,
-        _name,
-        frequencyValue,
-        unitValue,
-        double.parse(_dose),
-        int.parse(_count),
-      );
-
-      if (kDebugMode) {
-        print(newMed.toString());
-      }
-
-      widget.onAdd(newMed);
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Medication added')),
-      );
-
-      Navigator.pop(context);
     }
   }
 
@@ -93,6 +106,7 @@ class _MedicationEntryState extends State<MedicationEntry> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
+        backgroundColor: const Color.fromARGB(255, 176, 121, 187),
         title: const Text('Entry'),
       ),
       body: newMedicationForm(),
@@ -108,6 +122,7 @@ class _MedicationEntryState extends State<MedicationEntry> {
         child: Column(
           children: <Widget>[
             TextFormField(
+              initialValue: _name,
               decoration: const InputDecoration(labelText: 'Name'),
               validator: (value) {
                 if (value!.isEmpty) {
@@ -123,6 +138,7 @@ class _MedicationEntryState extends State<MedicationEntry> {
               children: [
                 Expanded(
                   child: TextFormField(
+                    initialValue: _dose,
                     decoration: const InputDecoration(labelText: 'Dose'),
                     keyboardType: TextInputType.number,
                     inputFormatters: <TextInputFormatter>[
@@ -139,8 +155,10 @@ class _MedicationEntryState extends State<MedicationEntry> {
                     },
                   ),
                 ),
+                const Padding(padding: EdgeInsets.all(16.0)),
                 Expanded(
                   child: TextFormField(
+                    initialValue: _count,
                     decoration: const InputDecoration(labelText: 'Count'),
                     keyboardType: TextInputType.number,
                     inputFormatters: <TextInputFormatter>[
