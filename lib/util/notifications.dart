@@ -1,3 +1,4 @@
+import 'package:flutter/material.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 
 class LocalNotificationService {
@@ -8,6 +9,7 @@ class LocalNotificationService {
     final AndroidInitializationSettings initializationSettingsAndroid =
         AndroidInitializationSettings('@mipmap/ic_launcher');
 
+  WidgetsFlutterBinding.ensureInitialized();
   await _flutterLocalNotificationsPlugin.initialize(
     InitializationSettings(
       android: initializationSettingsAndroid,

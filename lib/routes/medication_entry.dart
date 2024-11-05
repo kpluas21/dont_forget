@@ -1,10 +1,14 @@
-import 'package:dont_forget/main.dart';
-import 'package:dont_forget/main_app_drawer.dart';
+import 'package:dont_forget/util/main_app_drawer.dart';
 import 'package:dont_forget/models/medication.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:dont_forget/util/confirm_dialog.dart';
+
+//Lists of possible values for medication properties
+final List<Frequency> frequencies = Frequency.values;
+final List<MeasurementUnit> units = MeasurementUnit.values;
+final List<MedicationType> types = MedicationType.values;
 
 class MedicationEntry extends StatefulWidget {
   final Medication? existingMed;

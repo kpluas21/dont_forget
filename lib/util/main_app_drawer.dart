@@ -1,4 +1,4 @@
-import 'package:dont_forget/main.dart';
+import 'package:dont_forget/routes/home_page.dart';
 import 'package:flutter/material.dart';
 
 class MainAppDrawer extends StatelessWidget {
