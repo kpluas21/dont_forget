@@ -129,6 +129,7 @@ class _MedicationEntryState extends State<MedicationEntry> {
         child: Column(
           children: <Widget>[
             TextFormField(
+              textCapitalization: TextCapitalization.words,
               initialValue: _name,
               decoration: const InputDecoration(labelText: 'Name'),
               validator: (value) {
