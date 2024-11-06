@@ -1,4 +1,3 @@
-import 'package:dont_forget/util/main_app_drawer.dart';
 import 'package:dont_forget/models/medication.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
