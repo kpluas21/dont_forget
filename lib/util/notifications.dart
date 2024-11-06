@@ -6,30 +6,33 @@ class LocalNotificationService {
       FlutterLocalNotificationsPlugin();
 
   Future<void> init() async {
+    _flutterLocalNotificationsPlugin.resolvePlatformSpecificImplementation<
+    AndroidFlutterLocalNotificationsPlugin>()?.requestNotificationsPermission();
+
     final AndroidInitializationSettings initializationSettingsAndroid =
         AndroidInitializationSettings('@mipmap/ic_launcher');
 
-  WidgetsFlutterBinding.ensureInitialized();
-  await _flutterLocalNotificationsPlugin.initialize(
-    InitializationSettings(
-      android: initializationSettingsAndroid,
-    ),
-  );
-
+    await _flutterLocalNotificationsPlugin.initialize(
+      InitializationSettings(
+        android: initializationSettingsAndroid,
+      ),
+    );
   }
-
 
   void showNotificationAndroid(String title, String value) async {
-    const AndroidNotificationDetails androidNotificationDetails = AndroidNotificationDetails('channelId', 'channelName',
-        channelDescription: 'channelDescription',
-        importance: Importance.max,
-        priority: Priority.high,
-        ticker: 'ticker');
+    const AndroidNotificationDetails androidNotificationDetails =
+        AndroidNotificationDetails('channelId', 'channelName',
+            channelDescription: 'channelDescription',
+            importance: Importance.max,
+            priority: Priority.high,
+            ticker: 'ticker');
 
-        int notificationId = 1;
-        const NotificationDetails notificationDetails = NotificationDetails(android: androidNotificationDetails);
+    int notificationId = 1;
+    const NotificationDetails notificationDetails =
+        NotificationDetails(android: androidNotificationDetails);
 
-        await _flutterLocalNotificationsPlugin.show(notificationId, title, value, notificationDetails, payload: 'item x');
+    await _flutterLocalNotificationsPlugin.show(
+        notificationId, title, value, notificationDetails,
+        payload: 'item x');
   }
 }
-

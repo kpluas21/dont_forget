@@ -111,10 +111,14 @@ class _MedicationEntryState extends State<MedicationEntry> {
     return Scaffold(
       appBar: AppBar(
         backgroundColor: const Color.fromARGB(255, 176, 121, 187),
-        title: const Text('Entry'),
+        title: const Text('Medication Editor'),
+        leading: IconButton(
+            icon: Icon(Icons.arrow_back),
+            onPressed: () {
+              Navigator.pop(context);
+            }),
       ),
       body: newMedicationForm(),
-      drawer: const MainAppDrawer(),
     );
   }
 
@@ -200,6 +204,7 @@ class _MedicationEntryState extends State<MedicationEntry> {
                           ))
                       .toList(),
                 ),
+                Padding(padding: const EdgeInsets.all(16.0)),
                 // Frequency dropdown
                 DropdownButton<Frequency>(
                   value: frequencyValue,
@@ -215,6 +220,7 @@ class _MedicationEntryState extends State<MedicationEntry> {
                           ))
                       .toList(),
                 ),
+                Padding(padding: const EdgeInsets.all(16.0)),
                 // Type dropdown
                 DropdownButton(
                   value: typeValue,

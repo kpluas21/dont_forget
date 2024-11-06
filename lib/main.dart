@@ -8,6 +8,10 @@ final MedicationProvider medMgr = MedicationProvider();
 //TODO: Implement reminder notifications
 
 void main() async {
+  // Ensure that the FlutterLocalNotificationsPlugin is initialized
+  WidgetsFlutterBinding.ensureInitialized();
+
+
   // Initialize the local notification service
   await LocalNotificationService().init();
 

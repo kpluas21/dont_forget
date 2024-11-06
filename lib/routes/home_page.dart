@@ -3,6 +3,7 @@ import 'package:dont_forget/util/main_app_drawer.dart';
 import 'package:dont_forget/routes/medication_entry.dart';
 import 'package:dont_forget/models/medication.dart';
 import 'package:dont_forget/util/confirm_dialog.dart';
+import 'package:dont_forget/util/notifications.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 
@@ -12,7 +13,6 @@ class HomePage extends StatefulWidget {
   @override
   State<HomePage> createState() => _HomePageState();
 }
-
 
 class _HomePageState extends State<HomePage> {
   @override
@@ -28,7 +28,7 @@ class _HomePageState extends State<HomePage> {
       });
     });
   }
-  
+
   // Add a new medication to the list
   void _addMedication(Medication newMed) {
     setState(() {
@@ -67,14 +67,14 @@ class _HomePageState extends State<HomePage> {
             child: const Icon(Icons.add),
           ),
           // Display the list of medications
-          body: ListView.builder(
+          body: ListView.separated(
             itemCount: medMgr.medications.length,
             itemBuilder: (context, index) {
               final med = medMgr.medications[index];
               // Display a ListTile for each medication
               return ListTile(
                 selected: true,
-                selectedTileColor: Colors.purple[100],
+                selectedTileColor: const Color.fromARGB(255, 163, 195, 221),
                 shape: RoundedRectangleBorder(
                     borderRadius: BorderRadius.circular(50)),
                 onLongPress: () {
@@ -94,6 +94,9 @@ class _HomePageState extends State<HomePage> {
                     .last),
               );
             },
+            separatorBuilder: (context, index) => SizedBox(
+              height: 10,
+            ),
           ),
 
           appBar: AppBar(
