@@ -119,7 +119,6 @@ class _HomePageState extends State<HomePage> {
               leading: const Icon(Icons.edit),
               title: const Text('Edit'),
               onTap: () {
-                Navigator.pop(context);
                 Navigator.push(
                   context,
                   MaterialPageRoute(
