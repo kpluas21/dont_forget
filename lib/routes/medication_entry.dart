@@ -1,4 +1,5 @@
 import 'package:dont_forget/models/medication.dart';
+import 'package:dont_forget/util/helper_funcs.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
@@ -40,6 +41,8 @@ class _MedicationEntryState extends State<MedicationEntry> {
   late MedicationType typeValue;
   late Frequency frequencyValue;
   late MeasurementUnit unitValue;
+
+  DateTime? startDate = DateTime.now();
 
   // Initialize the form with the existing medication values if they exist
   @override
@@ -200,7 +203,7 @@ class _MedicationEntryState extends State<MedicationEntry> {
                       .map((MeasurementUnit unit) =>
                           DropdownMenuItem<MeasurementUnit>(
                             value: unit,
-                            child: Text(unit.toString().split('.').last),
+                            child: Text(getEnumValueString(unit)),
                           ))
                       .toList(),
                 ),
@@ -216,7 +219,7 @@ class _MedicationEntryState extends State<MedicationEntry> {
                   items: frequencies
                       .map((Frequency freq) => DropdownMenuItem<Frequency>(
                             value: freq,
-                            child: Text(freq.toString().split('.').last),
+                            child: Text(getEnumValueString(freq)),
                           ))
                       .toList(),
                 ),
@@ -232,11 +235,15 @@ class _MedicationEntryState extends State<MedicationEntry> {
                   items: types
                       .map((MedicationType type) => DropdownMenuItem(
                             value: type,
-                            child: Text(type.toString().split('.').last),
+                            child: Text(getEnumValueString(type)),
                           ))
                       .toList(),
                 ),
               ],
+            ),
+            Expanded(
+              child: DatePickerDialog(
+                  firstDate: DateTime(2024), lastDate: DateTime(2025)),
             ),
             const SizedBox(
               height: 20.0,
@@ -244,7 +251,7 @@ class _MedicationEntryState extends State<MedicationEntry> {
             ElevatedButton(
               onPressed: () {
                 showConfirmDialog(
-                    context, _submitForm, 'Are you sure you want to submit?');
+                    context, _submitForm, 'Are you sure you want to add this new medication?');
               },
               child: const Text('Submit'),
             ),

@@ -1,4 +1,5 @@
 import 'package:dont_forget/main.dart';
+import 'package:dont_forget/util/helper_funcs.dart';
 import 'package:dont_forget/util/main_app_drawer.dart';
 import 'package:dont_forget/routes/medication_entry.dart';
 import 'package:dont_forget/models/medication.dart';
@@ -66,37 +67,40 @@ class _HomePageState extends State<HomePage> {
             child: const Icon(Icons.add),
           ),
           // Display the list of medications
-          body: ListView.separated(
-            itemCount: medMgr.medications.length,
-            itemBuilder: (context, index) {
-              final med = medMgr.medications[index];
-              // Display a ListTile for each medication
-              return ListTile(
-                selected: true,
-                selectedTileColor: const Color.fromARGB(255, 163, 195, 221),
-                shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(50)),
-                onLongPress: () {
-                  if (kDebugMode) {
-                    print('Long press on ${med.name}');
-                  }
-                  longTapMenu(context, index);
-                },
-                leading: Padding(
-                    padding: const EdgeInsets.all(12.0),
-                    child: const Icon(Icons.medication)),
-                title: Text(
-                    '${med.count} x ${med.name} - ${med.dose} ${med.unit.toString().split('.').last}'),
-                subtitle: Text(medMgr.medications[index].frequency
-                    .toString()
-                    .split('.')
-                    .last),
-              );
-            },
-            separatorBuilder: (context, index) => SizedBox(
-              height: 10,
-            ),
-          ),
+          body: medMgr.medications.isEmpty
+              ? const Center(
+                  child: Text('No medications added yet\nTap the + button to add one!'),
+                )
+              : ListView.separated(
+                  itemCount: medMgr.medications.length,
+                  itemBuilder: (context, index) {
+                    final med = medMgr.medications[index];
+                    // Display a ListTile for each medication
+                    return ListTile(
+                      selected: true,
+                      selectedTileColor:
+                          const Color.fromARGB(255, 163, 195, 221),
+                      shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(50)),
+                      onLongPress: () {
+                        if (kDebugMode) {
+                          print('Long press on ${med.name}');
+                        }
+                        longTapMenu(context, index);
+                      },
+                      leading: Padding(
+                          padding: const EdgeInsets.all(12.0),
+                          child: const Icon(Icons.medication)),
+                      title: Text(
+                          '${med.count} x ${med.name} - ${med.dose} ${getEnumValueString(med.unit)}'),
+                      subtitle: Text(getEnumValueString(
+                          medMgr.medications[index].frequency)),
+                    );
+                  },
+                  separatorBuilder: (context, index) => SizedBox(
+                    height: 10,
+                  ),
+                ),
 
           appBar: AppBar(
             backgroundColor: const Color.fromARGB(255, 176, 121, 187),
@@ -119,6 +123,7 @@ class _HomePageState extends State<HomePage> {
               leading: const Icon(Icons.edit),
               title: const Text('Edit'),
               onTap: () {
+                Navigator.pop(context);
                 Navigator.push(
                   context,
                   MaterialPageRoute(
@@ -132,7 +137,6 @@ class _HomePageState extends State<HomePage> {
                       onUpdate: (oldMed, newMed) {
                         setState(() {
                           medMgr.updateMedication(oldMed, newMed);
-                          Navigator.pop(context);
                         });
                       },
                     ),
@@ -146,10 +150,10 @@ class _HomePageState extends State<HomePage> {
               leading: const Icon(Icons.delete),
               title: const Text('Delete'),
               onTap: () {
+                Navigator.pop(context);
                 showConfirmDialog(context, () {
                   setState(() {
                     medMgr.removeMedication(medMgr.medications[index]);
-                    Navigator.pop(context);
                   });
                 }, 'Are you sure you want to delete this medication?');
               },

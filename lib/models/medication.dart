@@ -30,10 +30,19 @@ enum MedicationType {
   suppository,
 }
 
+
+/// A class representing a medication.
+/// 
+/// This class is used to store information about a medication, 
+/// including its name, dosage, and any other relevant details.
 class Medication {
   MedicationType type;
   Frequency frequency;
   MeasurementUnit unit;
+
+  //When the medication was started and when the next reminder is due
+  DateTime? startDate;
+  DateTime? nextReminderDate;
 
   String name;
   double dose;
