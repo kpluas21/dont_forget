@@ -10,4 +10,4 @@ your medications!
   &emsp;&emsp;&emsp;&emsp;
   <img src="https://github.com/kpluas21/dont_forget/blob/main/res/dontforgetsnap2.png" alt="Edit Form" width="330">  
 </div>
-<br />C:\Users\Kevin\AndroidStudioProjects\DontForgetDev\dont_forget\res\dontforgetsnap2.png
+<br />
