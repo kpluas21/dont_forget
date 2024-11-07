@@ -1,3 +1,5 @@
-# dont_forget
+# Don't Forget
 
-A new Flutter project.
+A simple medication tracker for mobile devices. This application supports reminders so you don't forget to take 
+your medications!
+
