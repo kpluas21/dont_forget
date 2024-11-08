@@ -1,5 +1,6 @@
 import 'package:dont_forget/models/medication.dart';
 import 'package:dont_forget/util/helper_funcs.dart';
+import 'package:dont_forget/util/notifications.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
@@ -43,6 +44,7 @@ class _MedicationEntryState extends State<MedicationEntry> {
   late MeasurementUnit unitValue;
 
   DateTime? startDate = DateTime.now();
+  DateTime? scheduledTime;
 
   // Initialize the form with the existing medication values if they exist
   @override
@@ -76,6 +78,7 @@ class _MedicationEntryState extends State<MedicationEntry> {
           unitValue,
           double.parse(_dose),
           int.parse(_count),
+          scheduledTime,
         );
 
         widget.onUpdate(widget.existingMed!, newMed);
@@ -92,10 +95,20 @@ class _MedicationEntryState extends State<MedicationEntry> {
           unitValue,
           double.parse(_dose),
           int.parse(_count),
+          scheduledTime,
         );
 
         if (kDebugMode) {
           print(newMed.toString());
+        }
+
+        if (scheduledTime != null) {
+          // Schedule the notification
+          LocalNotificationService().scheduleNotificationAndroid(
+              0,
+              "Don't Forget",
+              "It's time to take your scheduled medication!",
+              scheduledTime!);
         }
 
         widget.onAdd(newMed);
@@ -106,6 +119,15 @@ class _MedicationEntryState extends State<MedicationEntry> {
         Navigator.pop(context);
       }
     }
+  }
+
+  Future<void> _selectDate(BuildContext context) async {
+    scheduledTime = await showDatePicker(
+      context: context,
+      initialDate: startDate!,
+      firstDate: DateTime(2021),
+      lastDate: DateTime(2025),
+    );
   }
 
   @override
@@ -146,6 +168,7 @@ class _MedicationEntryState extends State<MedicationEntry> {
               },
             ),
             Row(
+              mainAxisAlignment: MainAxisAlignment.spaceEvenly,
               children: [
                 Expanded(
                   child: TextFormField(
@@ -189,8 +212,8 @@ class _MedicationEntryState extends State<MedicationEntry> {
               ],
             ),
             Row(
+              mainAxisAlignment: MainAxisAlignment.spaceEvenly,
               children: [
-                Padding(padding: const EdgeInsets.all(16.0)),
                 // Unit dropdown
                 DropdownButton<MeasurementUnit>(
                   value: unitValue,
@@ -241,19 +264,23 @@ class _MedicationEntryState extends State<MedicationEntry> {
                 ),
               ],
             ),
-            Expanded(
-              child: DatePickerDialog(
-                  firstDate: DateTime(2024), lastDate: DateTime(2025)),
-            ),
             const SizedBox(
               height: 20.0,
             ),
-            ElevatedButton(
-              onPressed: () {
-                showConfirmDialog(
-                    context, _submitForm, 'Are you sure you want to add this new medication?');
-              },
-              child: const Text('Submit'),
+            Row(
+              mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+              children: [
+                ElevatedButton(
+                    onPressed: () => _selectDate(context),
+                    child: const Text('Remind Me!')),
+                ElevatedButton(
+                  onPressed: () {
+                    showConfirmDialog(context, _submitForm,
+                        'Are you sure you want to add this new medication?');
+                  },
+                  child: const Text('Submit'),
+                ),
+              ],
             ),
           ],
         ),
