@@ -4,6 +4,7 @@ import 'package:dont_forget/util/main_app_drawer.dart';
 import 'package:dont_forget/routes/medication_entry.dart';
 import 'package:dont_forget/models/medication.dart';
 import 'package:dont_forget/util/confirm_dialog.dart';
+import 'package:dont_forget/util/notifications.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 
@@ -69,7 +70,8 @@ class _HomePageState extends State<HomePage> {
           // Display the list of medications
           body: medMgr.medications.isEmpty
               ? const Center(
-                  child: Text('No medications added yet\nTap the + button to add one!'),
+                  child: Text(
+                      'No medications added yet\nTap the + button to add one!'),
                 )
               : ListView.separated(
                   itemCount: medMgr.medications.length,
@@ -93,8 +95,8 @@ class _HomePageState extends State<HomePage> {
                           child: const Icon(Icons.medication)),
                       title: Text(
                           '${med.count} x ${med.name} - ${med.dose} ${getEnumValueString(med.unit)}'),
-                      subtitle: Text(getEnumValueString(
-                          medMgr.medications[index].frequency)),
+                      subtitle: Text(
+                          '${med.frequencyString} - Next reminder at ${med.nextReminderDateString}'),
                     );
                   },
                   separatorBuilder: (context, index) => SizedBox(
