@@ -43,6 +43,10 @@ class Medication {
   Frequency frequency;
   MeasurementUnit unit;
 
+  //Whether the user wants a notification for this medication. 
+  //Alters the appearance of the medication in the list
+  bool toBeReminded = false;
+
   //When the next reminder is due
   DateTime? nextReminderDate;
 
@@ -54,7 +58,7 @@ class Medication {
   String get frequencyString => frequency.toString().split('.').last;
   String get unitString => unit.toString().split('.').last;
   String get nextReminderDateString =>
-      formatter.format(nextReminderDate!);
+      nextReminderDate != null ? formatter.format(nextReminderDate!) : 'No reminder set';
 
   Medication(
       this.type, this.name, this.frequency, this.unit, this.dose, this.count, this.nextReminderDate);
