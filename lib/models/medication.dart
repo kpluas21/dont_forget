@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'dart:convert';
+import 'package:intl/intl.dart';
 
 enum Frequency {
   daily,
@@ -31,6 +32,8 @@ enum MedicationType {
 }
 
 
+final DateFormat formatter = DateFormat('yyyy-MM-dd');
+
 /// A class representing a medication.
 /// 
 /// This class is used to store information about a medication, 
@@ -40,8 +43,7 @@ class Medication {
   Frequency frequency;
   MeasurementUnit unit;
 
-  //When the medication was started and when the next reminder is due
-  DateTime? startDate;
+  //When the next reminder is due
   DateTime? nextReminderDate;
 
   String name;
@@ -51,9 +53,11 @@ class Medication {
   String get typeString => type.toString().split('.').last;
   String get frequencyString => frequency.toString().split('.').last;
   String get unitString => unit.toString().split('.').last;
+  String get nextReminderDateString =>
+      formatter.format(nextReminderDate!);
 
   Medication(
-      this.type, this.name, this.frequency, this.unit, this.dose, this.count);
+      this.type, this.name, this.frequency, this.unit, this.dose, this.count, this.nextReminderDate);
 
   @override
   String toString() {
@@ -68,6 +72,7 @@ class Medication {
       'unit': unitString,
       'dose': dose,
       'count': count,
+      'nextReminderDate': nextReminderDate?.toIso8601String(),
     };
   }
 
@@ -82,6 +87,9 @@ class Medication {
           (unit) => unit.toString().split('.').last == json['unit']),
       json['dose'],
       json['count'] ?? 1,
+      json['nextReminderDate'] != null
+          ? DateTime.parse(json['nextReminderDate'])
+          : null,
     );
   }
 }
