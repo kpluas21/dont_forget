@@ -45,7 +45,8 @@ class _MedicationEntryState extends State<MedicationEntry> {
 
   bool toBeReminded = false;
   DateTime? startDate = DateTime.now();
-  DateTime? scheduledTime;
+  DateTime _currentDate = DateTime.now();
+  DateTime _currentTime = DateTime.now();
 
   // Initialize the form with the existing medication values if they exist
   @override
@@ -78,7 +79,15 @@ class _MedicationEntryState extends State<MedicationEntry> {
         unitValue,
         double.parse(_dose),
         int.parse(_count),
-        scheduledTime,
+        //if the user wants to be reminded, set the start date to the current date
+        // otherwise, set it to null
+        toBeReminded ? DateTime(
+            _currentDate.year,
+            _currentDate.month,
+            _currentDate.day,
+            _currentTime.hour,
+            _currentTime.minute
+        ) : null,
       );
 
       if (widget.existingMed != null) {
@@ -96,13 +105,14 @@ class _MedicationEntryState extends State<MedicationEntry> {
           print(newMed.toString());
         }
 
-        if (scheduledTime != null) {
+        if (toBeReminded) {
           // Schedule the notification
           LocalNotificationService().scheduleNotificationAndroid(
+            //TODO: Handle the notification ID
               0,
               "Don't Forget",
               "It's time to take your scheduled medication!",
-              scheduledTime!);
+              newMed.nextReminderDate!);
         }
 
         widget.onAdd(newMed);
@@ -115,20 +125,20 @@ class _MedicationEntryState extends State<MedicationEntry> {
     }
   }
 
-  Future<void> _selectDate(BuildContext context) async {
-    scheduledTime = await showDatePicker(
-      context: context,
-      initialDate: startDate!,
-      firstDate: DateTime(2021),
-      lastDate: DateTime(2025),
-    );
-  }
+  // Future<void> _selectDate(BuildContext context) async {
+  //   scheduledTime = await showDatePicker(
+  //     context: context,
+  //     initialDate: startDate!,
+  //     firstDate: DateTime(2021),
+  //     lastDate: DateTime(2025),
+  //   );
+  // }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        backgroundColor: const Color.fromARGB(255, 176, 121, 187),
+        backgroundColor: const Color.fromARGB(255, 61, 110, 202),
         title: const Text('Medication Editor'),
         leading: IconButton(
             icon: Icon(Icons.arrow_back),
@@ -136,7 +146,7 @@ class _MedicationEntryState extends State<MedicationEntry> {
               Navigator.pop(context);
             }),
       ),
-      body: newMedicationForm(),
+      body: SingleChildScrollView(child: newMedicationForm()),
     );
   }
 
@@ -168,11 +178,12 @@ class _MedicationEntryState extends State<MedicationEntry> {
               mainAxisAlignment: MainAxisAlignment.spaceEvenly,
               children: [
                 IntFormField(
-                    initialValue: _count,
-                    labelText: 'Count',
-                    onSaved: (value) {
-                      _count = value!;
-                    }),
+                  initialValue: _count,
+                  labelText: 'Count',
+                  onSaved: (value) {
+                    _count = value!;
+                  },
+                ),
                 const Padding(padding: EdgeInsets.all(16.0)),
                 IntFormField(
                   initialValue: _dose,
@@ -245,10 +256,25 @@ class _MedicationEntryState extends State<MedicationEntry> {
             Row(
               mainAxisAlignment: MainAxisAlignment.spaceEvenly,
               children: [
-                //TODO: Add a switch to enable/disable reminders
-                ElevatedButton(
-                    onPressed: () => _selectDate(context),
-                    child: const Text('Remind Me!')),
+                Column(
+                  children: [
+                    const Text('Enable Reminders'),
+                    ToggleButtons(
+                      isSelected: [toBeReminded],
+                      onPressed: (int index) {
+                        setState(() {
+                          toBeReminded = !toBeReminded;
+                        });
+                      },
+                      children: const [
+                        Icon(Icons.notifications),
+                      ],
+                    ),
+                  ],
+                ),
+                // ElevatedButton(
+                //     onPressed: () => _selectDate(context),
+                //     child: const Text('Remind Me!')),
                 ElevatedButton(
                   onPressed: () {
                     showConfirmDialog(context, _submitForm,
@@ -258,6 +284,52 @@ class _MedicationEntryState extends State<MedicationEntry> {
                 ),
               ],
             ),
+            if (toBeReminded == true)
+              Column(
+                children: [
+                  const Text('Choose a Date'),
+                  InkWell(
+                    onTap: () async {
+                      final DateTime? picked = await showDatePicker(
+                        context: context,
+                        initialDate: _currentDate,
+                        firstDate: DateTime.now(),
+                        lastDate: DateTime(2026),
+                      );
+                      if (picked != null && picked != _currentDate) {
+                        setState(() {
+                          _currentDate = picked;
+                        });
+                      }
+                    },
+                    child: Text(
+                      '${_currentDate.month}/${_currentDate.day}/${_currentDate.year}',
+                    ),
+                  ),
+                  const Text('Choose a Time'),
+                  InkWell(
+                    onTap: () async {
+                      final TimeOfDay? picked = await showTimePicker(
+                        context: context,
+                        initialTime: TimeOfDay.fromDateTime(_currentTime),
+                      );
+                      if (picked != null) {
+                        setState(() {
+                          _currentTime = DateTime(
+                              _currentTime.year,
+                              _currentTime.month,
+                              _currentTime.day,
+                              picked.hour,
+                              picked.minute);
+                        });
+                      }
+                    },
+                    child: Text(
+                      '${_currentTime.hour}:${_currentTime.minute > 9 ? _currentTime.minute : '0${_currentTime.minute}'}',
+                    ),
+                  )
+                ],
+              )
           ],
         ),
       ),
