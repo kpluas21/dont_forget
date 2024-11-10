@@ -5,6 +5,7 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:dont_forget/util/confirm_dialog.dart';
+import 'package:dont_forget/util/text_input.dart';
 
 //Lists of possible values for medication properties
 final List<Frequency> frequencies = Frequency.values;
@@ -46,7 +47,6 @@ class _MedicationEntryState extends State<MedicationEntry> {
   bool toBeReminded = false;
   DateTime? startDate = DateTime.now();
   DateTime? scheduledTime;
-
 
   // Initialize the form with the existing medication values if they exist
   @override
@@ -162,49 +162,30 @@ class _MedicationEntryState extends State<MedicationEntry> {
                 _name = value!;
               },
             ),
+            const SizedBox(
+              height: 30.0,
+            ),
             Row(
               mainAxisAlignment: MainAxisAlignment.spaceEvenly,
               children: [
-                Expanded(
-                  child: TextFormField(
-                    initialValue: _dose,
-                    decoration: const InputDecoration(labelText: 'Dose'),
-                    keyboardType: TextInputType.number,
-                    inputFormatters: <TextInputFormatter>[
-                      FilteringTextInputFormatter.digitsOnly
-                    ],
-                    validator: (value) {
-                      if (value!.isEmpty) {
-                        return 'Please enter a dose';
-                      }
-                      return null;
-                    },
-                    onSaved: (value) {
-                      _dose = value!;
-                    },
-                  ),
-                ),
-                const Padding(padding: EdgeInsets.all(16.0)),
-                Expanded(
-                  child: TextFormField(
+                IntFormField(
                     initialValue: _count,
-                    decoration: const InputDecoration(labelText: 'Count'),
-                    keyboardType: TextInputType.number,
-                    inputFormatters: <TextInputFormatter>[
-                      FilteringTextInputFormatter.digitsOnly
-                    ],
-                    validator: (value) {
-                      if (value!.isEmpty) {
-                        return 'Please enter a count';
-                      }
-                      return null;
-                    },
+                    labelText: 'Count',
                     onSaved: (value) {
                       _count = value!;
-                    },
-                  ),
+                    }),
+                const Padding(padding: EdgeInsets.all(16.0)),
+                IntFormField(
+                  initialValue: _dose,
+                  labelText: 'Dose',
+                  onSaved: (value) {
+                    _dose = value!;
+                  },
                 ),
               ],
+            ),
+            const SizedBox(
+              height: 30.0,
             ),
             Row(
               mainAxisAlignment: MainAxisAlignment.spaceEvenly,
@@ -260,12 +241,11 @@ class _MedicationEntryState extends State<MedicationEntry> {
               ],
             ),
             const SizedBox(
-              height: 20.0,
+              height: 30.0,
             ),
             Row(
               mainAxisAlignment: MainAxisAlignment.spaceEvenly,
               children: [
-
                 ElevatedButton(
                     onPressed: () => _selectDate(context),
                     child: const Text('Remind Me!')),
