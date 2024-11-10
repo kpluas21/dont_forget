@@ -48,7 +48,7 @@ class _HomePageState extends State<HomePage> {
     return MaterialApp(
       theme: ThemeData(
         colorScheme: ColorScheme.fromSeed(
-            seedColor: Colors.purple, brightness: Brightness.light),
+            seedColor: const Color.fromARGB(255, 109, 107, 209), brightness: Brightness.light),
       ),
       home: Builder(builder: (context) {
         return Scaffold(
@@ -80,7 +80,7 @@ class _HomePageState extends State<HomePage> {
                     return ListTile(
                       selected: true,
                       selectedTileColor:
-                          const Color.fromARGB(255, 163, 195, 221),
+                          const Color.fromARGB(255, 141, 197, 243),
                       shape: RoundedRectangleBorder(
                           borderRadius: BorderRadius.circular(50)),
                       onLongPress: () {
@@ -102,9 +102,8 @@ class _HomePageState extends State<HomePage> {
                     height: 10,
                   ),
                 ),
-
           appBar: AppBar(
-            backgroundColor: const Color.fromARGB(255, 176, 121, 187),
+            backgroundColor: const Color.fromARGB(255, 61, 110, 202),
             title: const Text("Don't Forget"),
           ),
           // Add the main drawer to the Scaffold
