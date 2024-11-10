@@ -3,7 +3,6 @@ import 'package:dont_forget/util/helper_funcs.dart';
 import 'package:dont_forget/util/notifications.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
 import 'package:dont_forget/util/confirm_dialog.dart';
 import 'package:dont_forget/util/text_input.dart';
 
@@ -246,6 +245,7 @@ class _MedicationEntryState extends State<MedicationEntry> {
             Row(
               mainAxisAlignment: MainAxisAlignment.spaceEvenly,
               children: [
+                //TODO: Add a switch to enable/disable reminders
                 ElevatedButton(
                     onPressed: () => _selectDate(context),
                     child: const Text('Remind Me!')),
