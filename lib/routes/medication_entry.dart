@@ -43,8 +43,10 @@ class _MedicationEntryState extends State<MedicationEntry> {
   late Frequency frequencyValue;
   late MeasurementUnit unitValue;
 
+  bool toBeReminded = false;
   DateTime? startDate = DateTime.now();
   DateTime? scheduledTime;
+
 
   // Initialize the form with the existing medication values if they exist
   @override
@@ -70,34 +72,27 @@ class _MedicationEntryState extends State<MedicationEntry> {
     if (_formKey.currentState!.validate()) {
       _formKey.currentState!.save();
 
+      newMed = Medication(
+        typeValue,
+        _name,
+        frequencyValue,
+        unitValue,
+        double.parse(_dose),
+        int.parse(_count),
+        scheduledTime,
+      );
+
       if (widget.existingMed != null) {
-        newMed = Medication(
-          typeValue,
-          _name,
-          frequencyValue,
-          unitValue,
-          double.parse(_dose),
-          int.parse(_count),
-          scheduledTime,
-        );
-
+        if (kDebugMode) {
+          print(
+              "Updating medication: ${widget.existingMed!.toString()} to ${newMed.toString()}");
+        }
         widget.onUpdate(widget.existingMed!, newMed);
-
         ScaffoldMessenger.of(context).showSnackBar(
           const SnackBar(content: Text('Medication updated')),
         );
         Navigator.pop(context);
       } else {
-        newMed = Medication(
-          typeValue,
-          _name,
-          frequencyValue,
-          unitValue,
-          double.parse(_dose),
-          int.parse(_count),
-          scheduledTime,
-        );
-
         if (kDebugMode) {
           print(newMed.toString());
         }
@@ -270,6 +265,7 @@ class _MedicationEntryState extends State<MedicationEntry> {
             Row(
               mainAxisAlignment: MainAxisAlignment.spaceEvenly,
               children: [
+
                 ElevatedButton(
                     onPressed: () => _selectDate(context),
                     child: const Text('Remind Me!')),
