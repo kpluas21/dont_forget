@@ -94,8 +94,11 @@ class _HomePageState extends State<HomePage> {
                           child: const Icon(Icons.medication)),
                       title: Text(
                           '${med.count} x ${med.name} - ${med.dose} ${getEnumValueString(med.unit)}'),
-                      subtitle: Text(
-                          '${med.frequencyString} - Next reminder at ${med.nextReminderDateString}'),
+                      subtitle: kDebugMode
+                          ? Text(
+                              '${med.frequencyString} - Next reminder at ${med.nextReminderDateString} - Notification ID: ${med.notificationId}')
+                          : Text(
+                              '${med.frequencyString} - Next reminder at ${med.nextReminderDateString}'),
                     );
                   },
                   separatorBuilder: (context, index) => SizedBox(
