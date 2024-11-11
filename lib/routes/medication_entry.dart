@@ -81,13 +81,11 @@ class _MedicationEntryState extends State<MedicationEntry> {
         int.parse(_count),
         //if the user wants to be reminded, set the start date to the current date
         // otherwise, set it to null
-        toBeReminded ? DateTime(
-            _currentDate.year,
-            _currentDate.month,
-            _currentDate.day,
-            _currentTime.hour,
-            _currentTime.minute
-        ) : null,
+        toBeReminded
+            ? DateTime(_currentDate.year, _currentDate.month, _currentDate.day,
+                _currentTime.hour, _currentTime.minute)
+            : null,
+        null, //notificationId
       );
 
       if (widget.existingMed != null) {
@@ -106,13 +104,13 @@ class _MedicationEntryState extends State<MedicationEntry> {
         }
 
         if (toBeReminded) {
-          // Schedule the notification
-          LocalNotificationService().scheduleNotificationAndroid(
-            //TODO: Handle the notification ID
-              0,
-              "Don't Forget",
-              "It's time to take your scheduled medication!",
-              newMed.nextReminderDate!);
+          DateTime scheduledTime = DateTime(
+              _currentDate.year,
+              _currentDate.month,
+              _currentDate.day,
+              _currentTime.hour,
+              _currentTime.minute);
+          newMed.notificationId = LocalNotificationService().addNotifications(scheduledTime);
         }
 
         widget.onAdd(newMed);
@@ -124,15 +122,6 @@ class _MedicationEntryState extends State<MedicationEntry> {
       }
     }
   }
-
-  // Future<void> _selectDate(BuildContext context) async {
-  //   scheduledTime = await showDatePicker(
-  //     context: context,
-  //     initialDate: startDate!,
-  //     firstDate: DateTime(2021),
-  //     lastDate: DateTime(2025),
-  //   );
-  // }
 
   @override
   Widget build(BuildContext context) {

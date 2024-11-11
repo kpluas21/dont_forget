@@ -1,8 +1,12 @@
+import 'package:flutter/foundation.dart';
 import 'package:timezone/data/latest.dart' as tz;
 import 'package:timezone/timezone.dart' as tz;
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 
-class LocalNotificationService {
+class LocalNotificationService with ChangeNotifier {
+  final List<int> _notifications = [];
+  List<int> get notifications => _notifications;
+
   final FlutterLocalNotificationsPlugin flutterLocalNotificationsPlugin =
       FlutterLocalNotificationsPlugin();
 
@@ -17,11 +21,12 @@ class LocalNotificationService {
   Future<void> init() async {
     // Initialize the timezone
     tz.initializeTimeZones();
-    
-    // Request permissions for Android
-    flutterLocalNotificationsPlugin.resolvePlatformSpecificImplementation<
-    AndroidFlutterLocalNotificationsPlugin>()?.requestNotificationsPermission();
 
+    // Request permissions for Android
+    flutterLocalNotificationsPlugin
+        .resolvePlatformSpecificImplementation<
+            AndroidFlutterLocalNotificationsPlugin>()
+        ?.requestNotificationsPermission();
 
     // Initialize the notification plugin
     final AndroidInitializationSettings initializationSettingsAndroid =
@@ -35,8 +40,8 @@ class LocalNotificationService {
     );
   }
 
+  //Not used. Simply for testing purposes
   void showNotificationAndroid(String title, String value) async {
-
     int notificationId = 1;
     NotificationDetails notificationDetails =
         NotificationDetails(android: androidNotificationDetails);
@@ -46,19 +51,66 @@ class LocalNotificationService {
         payload: 'item x');
   }
 
-
   // Schedule a notification for a specific time
-  void scheduleNotificationAndroid(int notificationId, String title, String value, DateTime scheduledTime) async {
+  void scheduleNotificationAndroid(int notificationId, String title,
+      String value, DateTime scheduledTime) async {
     NotificationDetails notificationDetails =
         NotificationDetails(android: androidNotificationDetails);
-    
-    //Given a DateTime, convert it to a TZDateTime that is in the local timezone. 
-    final tz.TZDateTime tzScheduledTime = tz.TZDateTime.from(scheduledTime, tz.local);
-    
+
+    //Given a DateTime, convert it to a TZDateTime that is in the local timezone.
+    final tz.TZDateTime tzScheduledTime =
+        tz.TZDateTime.from(scheduledTime, tz.local);
+
+    if(kDebugMode) {
+      print('Scheduled time: $tzScheduledTime');
+    }
+
     // Schedule the notification
-    await flutterLocalNotificationsPlugin.zonedSchedule(notificationId, title, value,
-        tzScheduledTime, notificationDetails,
+    await flutterLocalNotificationsPlugin.zonedSchedule(
+        notificationId, title, value, tzScheduledTime, notificationDetails,
         androidScheduleMode: AndroidScheduleMode.exactAllowWhileIdle,
-        uiLocalNotificationDateInterpretation: UILocalNotificationDateInterpretation.absoluteTime);
+        uiLocalNotificationDateInterpretation:
+            UILocalNotificationDateInterpretation.absoluteTime,
+        payload: 'item x');
+  }
+
+  int _generateNotificationId() {
+    int id;
+    id = DateTime.now().millisecondsSinceEpoch.remainder(100000);
+    return id;
+  }
+
+  // Adds a notification id to the list
+  // Schedules a notification for a specific time
+  int addNotifications(DateTime scheduledTime) {
+    int notificationId = _generateNotificationId();
+    _notifications.add(notificationId);
+    scheduleNotificationAndroid(
+        notificationId, "Don't Forget!", "Take your medication", scheduledTime);
+    notifyListeners();
+    return notificationId;
+  }
+
+  void removeNotification(int notificationId) async {
+    _notifications.remove(notificationId);
+    await flutterLocalNotificationsPlugin.cancel(notificationId);
+    notifyListeners();
+  }
+}
+
+class NotificationManager with ChangeNotifier {
+  final List<int> _notifications = []; // List of notification IDs
+
+  List<int> get notifications => _notifications;
+
+  int _generateNotificationId() {
+    int id;
+    id = DateTime.now().millisecondsSinceEpoch.remainder(100000);
+    return id;
+  }
+
+  void addNotifications(int notificationId) {
+    _notifications.add(notificationId);
+    notifyListeners();
   }
 }
