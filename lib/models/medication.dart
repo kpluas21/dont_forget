@@ -31,21 +31,16 @@ enum MedicationType {
   suppository,
 }
 
-
-final DateFormat formatter = DateFormat('yyyy-MM-dd');
+final DateFormat formatter = DateFormat('yyyy-MM-dd HH:mm:ss');
 
 /// A class representing a medication.
-/// 
-/// This class is used to store information about a medication, 
+///
+/// This class is used to store information about a medication,
 /// including its name, dosage, and any other relevant details.
 class Medication {
   MedicationType type;
   Frequency frequency;
   MeasurementUnit unit;
-
-  //Whether the user wants a notification for this medication. 
-  //Alters the appearance of the medication in the list
-  bool toBeReminded = false;
 
   //When the next reminder is due
   DateTime? nextReminderDate;
@@ -53,15 +48,17 @@ class Medication {
   String name;
   double dose;
   int count = 1;
+  int? notificationId;
 
   String get typeString => type.toString().split('.').last;
   String get frequencyString => frequency.toString().split('.').last;
   String get unitString => unit.toString().split('.').last;
-  String get nextReminderDateString =>
-      nextReminderDate != null ? formatter.format(nextReminderDate!) : 'No reminder set';
+  String get nextReminderDateString => nextReminderDate != null
+      ? formatter.format(nextReminderDate!)
+      : 'No reminder set';
 
-  Medication(
-      this.type, this.name, this.frequency, this.unit, this.dose, this.count, this.nextReminderDate);
+  Medication(this.type, this.name, this.frequency, this.unit, this.dose,
+      this.count, this.nextReminderDate, this.notificationId);
 
   @override
   String toString() {
@@ -77,6 +74,7 @@ class Medication {
       'dose': dose,
       'count': count,
       'nextReminderDate': nextReminderDate?.toIso8601String(),
+      'notificationId': notificationId,
     };
   }
 
@@ -94,6 +92,7 @@ class Medication {
       json['nextReminderDate'] != null
           ? DateTime.parse(json['nextReminderDate'])
           : null,
+      json['notificationId'],
     );
   }
 }
