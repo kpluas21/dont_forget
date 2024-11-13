@@ -31,6 +31,7 @@ class MainAppDrawer extends StatelessWidget {
           ListTile(
             title: const Text('Settings'),
             onTap: () {
+              Navigator.pop(context);
               Navigator.push(
                 context,
                 MaterialPageRoute(builder: (context) => const SettingsPage()),
