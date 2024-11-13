@@ -294,8 +294,8 @@ class _MedicationEntryState extends State<MedicationEntry> {
                         onTap: () async {
                           final DateTime? picked = await showDatePicker(
                             context: context,
-                            initialDate: _currentDate,
-                            firstDate: DateTime.now(),
+                            initialDate: _currentDate.add(const Duration(days: 1)),
+                            firstDate: DateTime.now().add(const Duration(days: 1)),
                             lastDate: DateTime(2026),
                           );
                           if (picked != null && picked != _currentDate) {

@@ -6,6 +6,8 @@ import 'package:dont_forget/models/medication.dart';
 import 'package:dont_forget/util/confirm_dialog.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
+import '../theme/apptheme.dart';
+
 
 class HomePage extends StatefulWidget {
   const HomePage({super.key});
@@ -46,11 +48,7 @@ class _HomePageState extends State<HomePage> {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-      theme: ThemeData(
-        colorScheme: ColorScheme.fromSeed(
-            seedColor: const Color.fromARGB(255, 109, 107, 209),
-            brightness: Brightness.light),
-      ),
+      theme: lightTheme,
       home: Builder(builder: (context) {
         return Scaffold(
           // Add a floating action button to add a new medication
