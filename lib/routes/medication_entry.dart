@@ -276,45 +276,76 @@ class _MedicationEntryState extends State<MedicationEntry> {
             if (toBeReminded == true)
               Column(
                 children: [
-                  const Text('Choose a Date'),
-                  InkWell(
-                    onTap: () async {
-                      final DateTime? picked = await showDatePicker(
-                        context: context,
-                        initialDate: _currentDate,
-                        firstDate: DateTime.now(),
-                        lastDate: DateTime(2026),
-                      );
-                      if (picked != null && picked != _currentDate) {
-                        setState(() {
-                          _currentDate = picked;
-                        });
-                      }
-                    },
-                    child: Text(
-                      '${_currentDate.month}/${_currentDate.day}/${_currentDate.year}',
+                  SizedBox(
+                    height: 50,
+                  ),
+                  const Text('Choose a Date for the first reminder'),
+                  SizedBox(
+                    height: 75,
+                    width: 150,
+                    child: Ink(
+                      decoration: BoxDecoration(
+                        color: Colors.blue,
+                        borderRadius: BorderRadius.circular(20),
+                      ),
+                      child: InkWell(
+                        customBorder: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(20)),
+                        onTap: () async {
+                          final DateTime? picked = await showDatePicker(
+                            context: context,
+                            initialDate: _currentDate,
+                            firstDate: DateTime.now(),
+                            lastDate: DateTime(2026),
+                          );
+                          if (picked != null && picked != _currentDate) {
+                            setState(() {
+                              _currentDate = picked;
+                            });
+                          }
+                        },
+                        child: Center(
+                          child: Text(
+                            style: const TextStyle(fontSize: 20),
+                            '${_currentDate.month}/${_currentDate.day}/${_currentDate.year}',
+                          ),
+                        ),
+                      ),
                     ),
                   ),
-                  const Text('Choose a Time'),
-                  InkWell(
-                    onTap: () async {
-                      final TimeOfDay? picked = await showTimePicker(
-                        context: context,
-                        initialTime: TimeOfDay.fromDateTime(_currentTime),
-                      );
-                      if (picked != null) {
-                        setState(() {
-                          _currentTime = DateTime(
-                              _currentTime.year,
-                              _currentTime.month,
-                              _currentTime.day,
-                              picked.hour,
-                              picked.minute);
-                        });
-                      }
-                    },
-                    child: Text(
-                      '${_currentTime.hour}:${_currentTime.minute > 9 ? _currentTime.minute : '0${_currentTime.minute}'}',
+                  const Text('Choose a Time for the first reminder'),
+                  SizedBox(
+                    height: 75,
+                    width: 150,
+                    child: Ink(
+                      decoration: BoxDecoration(
+                        color: Colors.blue,
+                        borderRadius: BorderRadius.circular(20),
+                      ),
+                      child: InkWell(
+                        onTap: () async {
+                          final TimeOfDay? picked = await showTimePicker(
+                            context: context,
+                            initialTime: TimeOfDay.fromDateTime(_currentTime),
+                          );
+                          if (picked != null) {
+                            setState(() {
+                              _currentTime = DateTime(
+                                  _currentTime.year,
+                                  _currentTime.month,
+                                  _currentTime.day,
+                                  picked.hour,
+                                  picked.minute);
+                            });
+                          }
+                        },
+                        child: Center(
+                          child: Text(
+                            style: const TextStyle(fontSize: 20),
+                            '${_currentTime.hour}:${_currentTime.minute > 9 ? _currentTime.minute : '0${_currentTime.minute}'}',
+                          ),
+                        ),
+                      ),
                     ),
                   )
                 ],
