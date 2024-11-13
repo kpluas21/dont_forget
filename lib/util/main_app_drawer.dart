@@ -1,5 +1,6 @@
 import 'package:dont_forget/routes/home_page.dart';
 import 'package:flutter/material.dart';
+import 'package:dont_forget/routes/settings_page.dart';
 
 class MainAppDrawer extends StatelessWidget {
   const MainAppDrawer({
@@ -29,7 +30,12 @@ class MainAppDrawer extends StatelessWidget {
           ),
           ListTile(
             title: const Text('Settings'),
-            onTap: () {},
+            onTap: () {
+              Navigator.push(
+                context,
+                MaterialPageRoute(builder: (context) => const SettingsPage()),
+              );
+            },
           ),
         ],
       ),

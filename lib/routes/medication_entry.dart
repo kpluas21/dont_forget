@@ -1,6 +1,6 @@
+import 'package:dont_forget/main.dart';
 import 'package:dont_forget/models/medication.dart';
 import 'package:dont_forget/util/helper_funcs.dart';
-import 'package:dont_forget/util/notifications.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:dont_forget/util/confirm_dialog.dart';
@@ -110,7 +110,7 @@ class _MedicationEntryState extends State<MedicationEntry> {
               _currentDate.day,
               _currentTime.hour,
               _currentTime.minute);
-          newMed.notificationId = LocalNotificationService().addNotifications(scheduledTime);
+          newMed.notificationId = notificationService.addNotifications(scheduledTime);
         }
 
         widget.onAdd(newMed);

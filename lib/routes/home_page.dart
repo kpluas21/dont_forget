@@ -48,7 +48,8 @@ class _HomePageState extends State<HomePage> {
     return MaterialApp(
       theme: ThemeData(
         colorScheme: ColorScheme.fromSeed(
-            seedColor: const Color.fromARGB(255, 109, 107, 209), brightness: Brightness.light),
+            seedColor: const Color.fromARGB(255, 109, 107, 209),
+            brightness: Brightness.light),
       ),
       home: Builder(builder: (context) {
         return Scaffold(
@@ -56,13 +57,18 @@ class _HomePageState extends State<HomePage> {
           floatingActionButton: FloatingActionButton(
             onPressed: () {
               Navigator.push(
-                  context,
-                  MaterialPageRoute(
-                      builder: (context) => MedicationEntry(onAdd: (newMed) {
-                            _addMedication(newMed);
-                          }, onUpdate: (oldMed, newMed) {
-                            _updateMedication(oldMed, newMed);
-                          })));
+                context,
+                MaterialPageRoute(
+                  builder: (context) => MedicationEntry(
+                    onAdd: (newMed) {
+                      _addMedication(newMed);
+                    },
+                    onUpdate: (oldMed, newMed) {
+                      _updateMedication(oldMed, newMed);
+                    },
+                  ),
+                ),
+              );
             },
             child: const Icon(Icons.add),
           ),
@@ -156,6 +162,10 @@ class _HomePageState extends State<HomePage> {
                 Navigator.pop(context);
                 showConfirmDialog(context, () {
                   setState(() {
+                    if(medMgr.medications[index].notificationId != null) {
+                      notificationService
+                        .removeNotification(medMgr.medications[index].notificationId!);
+                    }
                     medMgr.removeMedication(medMgr.medications[index]);
                   });
                 }, 'Are you sure you want to delete this medication?');
