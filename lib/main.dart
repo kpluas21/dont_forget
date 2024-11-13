@@ -4,14 +4,14 @@ import 'models/medication.dart';
 import 'util/notifications.dart';
 
 final MedicationProvider medMgr = MedicationProvider();
+final LocalNotificationService notificationService = LocalNotificationService();
+
 
 void main() async {
   // Ensure that the FlutterLocalNotificationsPlugin is initialized
   WidgetsFlutterBinding.ensureInitialized();
+  notificationService.init();
 
-
-  // Initialize the local notification service
-  await LocalNotificationService().init();
 
   // Run the app
   runApp(const MainApp());
