@@ -8,7 +8,6 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import '../theme/apptheme.dart';
 
-
 class HomePage extends StatefulWidget {
   const HomePage({super.key});
 
@@ -40,9 +39,13 @@ class _HomePageState extends State<HomePage> {
 
   // Update an existing medication in the list
   void _updateMedication(Medication existingMed, Medication newMed) {
-    setState(() {
-      medMgr.updateMedication(existingMed, newMed);
-    });
+    try {
+      setState(() {
+        medMgr.updateMedication(existingMed, newMed);
+      });
+    } catch (e) {
+      print('Error updating medication: $e');
+    }
   }
 
   @override
@@ -61,9 +64,7 @@ class _HomePageState extends State<HomePage> {
                     onAdd: (newMed) {
                       _addMedication(newMed);
                     },
-                    onUpdate: (oldMed, newMed) {
-                      _updateMedication(oldMed, newMed);
-                    },
+                    onUpdate: (_, __) {}, // Do nothing
                   ),
                 ),
               );
@@ -91,7 +92,60 @@ class _HomePageState extends State<HomePage> {
                         if (kDebugMode) {
                           print('Long press on ${med.name}');
                         }
-                        longTapMenu(context, index);
+                        showMenu(
+                          context: context,
+                          position: RelativeRect.fromLTRB(100, 100, 100, 100),
+                          items: [
+                            PopupMenuItem(
+                              child: ListTile(
+                                leading: const Icon(Icons.edit),
+                                title: const Text('Edit'),
+                                onTap: () {
+                                  Navigator.pop(context);
+                                  Navigator.push(
+                                    context,
+                                    MaterialPageRoute(
+                                      builder: (context) => MedicationEntry(
+                                        existingMed: medMgr.medications[index],
+                                        onAdd: (_) {}, // Do nothing
+                                        onUpdate: (oldMed, newMed) {
+                                          setState(() {
+                                            _updateMedication(oldMed, newMed);
+                                          });
+                                        },
+                                      ),
+                                    ),
+                                  );
+                                },
+                              ),
+                            ),
+                            PopupMenuItem(
+                              child: ListTile(
+                                leading: const Icon(Icons.delete),
+                                title: const Text('Delete'),
+                                onTap: () {
+                                  Navigator.pop(context);
+                                  showConfirmDialog(context, () {
+                                    setState(
+                                      () {
+                                        if (medMgr.medications[index]
+                                                .notificationId !=
+                                            null) {
+                                          notificationService
+                                              .removeNotification(medMgr
+                                                  .medications[index]
+                                                  .notificationId!);
+                                        }
+                                        medMgr.removeMedication(
+                                            medMgr.medications[index]);
+                                      },
+                                    );
+                                  }, 'Are you sure you want to delete this medication?');
+                                },
+                              ),
+                            ),
+                          ],
+                        );
                       },
                       leading: Padding(
                           padding: const EdgeInsets.all(12.0),
@@ -118,58 +172,5 @@ class _HomePageState extends State<HomePage> {
         );
       }),
     );
-  }
-
-  Future<dynamic> longTapMenu(BuildContext context, int index) {
-    return showMenu(
-        context: context,
-        position: RelativeRect.fromLTRB(100, 100, 100, 100),
-        items: [
-          PopupMenuItem(
-            child: ListTile(
-              leading: const Icon(Icons.edit),
-              title: const Text('Edit'),
-              onTap: () {
-                Navigator.pop(context);
-                Navigator.push(
-                  context,
-                  MaterialPageRoute(
-                    builder: (context) => MedicationEntry(
-                      existingMed: medMgr.medications[index],
-                      onAdd: (newMed) {
-                        setState(() {
-                          medMgr.medications[index] = newMed;
-                        });
-                      },
-                      onUpdate: (oldMed, newMed) {
-                        setState(() {
-                          medMgr.updateMedication(oldMed, newMed);
-                        });
-                      },
-                    ),
-                  ),
-                );
-              },
-            ),
-          ),
-          PopupMenuItem(
-            child: ListTile(
-              leading: const Icon(Icons.delete),
-              title: const Text('Delete'),
-              onTap: () {
-                Navigator.pop(context);
-                showConfirmDialog(context, () {
-                  setState(() {
-                    if(medMgr.medications[index].notificationId != null) {
-                      notificationService
-                        .removeNotification(medMgr.medications[index].notificationId!);
-                    }
-                    medMgr.removeMedication(medMgr.medications[index]);
-                  });
-                }, 'Are you sure you want to delete this medication?');
-              },
-            ),
-          ),
-        ]);
   }
 }
