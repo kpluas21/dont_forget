@@ -1,5 +1,4 @@
 import 'package:dont_forget/main.dart';
-import 'package:dont_forget/util/helper_funcs.dart';
 import 'package:dont_forget/util/main_app_drawer.dart';
 import 'package:dont_forget/routes/medication_entry.dart';
 import 'package:dont_forget/models/medication.dart';
@@ -151,7 +150,7 @@ class _HomePageState extends State<HomePage> {
                           padding: const EdgeInsets.all(12.0),
                           child: const Icon(Icons.medication)),
                       title: Text(
-                          '${med.count} x ${med.name} - ${med.dose} ${getEnumValueString(med.unit)}'),
+                          '${med.count} x ${med.name} - ${med.dose} ${med.unit.displayString}'),
                       subtitle: kDebugMode
                           ? Text(
                               '${med.frequencyString} - Next reminder at ${med.nextReminderDateString} - Notification ID: ${med.notificationId}')

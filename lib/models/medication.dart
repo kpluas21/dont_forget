@@ -3,6 +3,7 @@ import 'package:shared_preferences/shared_preferences.dart';
 import 'dart:convert';
 import 'package:intl/intl.dart';
 
+/// An enumeration of the different dosage frequencies.
 enum Frequency {
   daily,
   weekly,
@@ -10,17 +11,53 @@ enum Frequency {
   monthly,
   quarterly,
   yearly,
-  asNeeded,
+  asNeeded;
+
+  String get displayString {
+    switch (this) {
+      case Frequency.daily:
+        return 'Daily';
+      case Frequency.weekly:
+        return 'Weekly';
+      case Frequency.biweekly:
+        return 'Biweekly';
+      case Frequency.monthly:
+        return 'Monthly';
+      case Frequency.quarterly:
+        return 'Quarterly';
+      case Frequency.yearly:
+        return 'Yearly';
+      case Frequency.asNeeded:
+        return 'As Needed';
+    }
+  }
 }
 
+/// An enumeration of the different units of measurement.
 enum MeasurementUnit {
   mg,
   g,
   mL,
   L,
-  oz,
+  oz;
+
+  String get displayString {
+    switch (this) {
+      case MeasurementUnit.mg:
+        return 'mg';
+      case MeasurementUnit.g:
+        return 'g';
+      case MeasurementUnit.mL:
+        return 'mL';
+      case MeasurementUnit.L:
+        return 'L';
+      case MeasurementUnit.oz:
+        return 'oz';
+    }
+  }
 }
 
+/// An enumeration of the different types of medications.
 enum MedicationType {
   capsule,
   tablet,
@@ -28,7 +65,26 @@ enum MedicationType {
   gummy,
   liquid,
   injection,
-  suppository,
+  suppository;
+
+  String get displayString {
+    switch (this) {
+      case MedicationType.capsule:
+        return 'Capsule';
+      case MedicationType.tablet:
+        return 'Tablet';
+      case MedicationType.patch:
+        return 'Patch';
+      case MedicationType.gummy:
+        return 'Gummy';
+      case MedicationType.liquid:
+        return 'Liquid';
+      case MedicationType.injection:
+        return 'Injection';
+      case MedicationType.suppository:
+        return 'Suppository';
+    }
+  }
 }
 
 final DateFormat formatter = DateFormat('yyyy-MM-dd HH:mm:ss');
@@ -97,7 +153,7 @@ class Medication {
   }
 }
 
-//Saves medications to local storage
+///Saves medications to local storage
 Future<void> saveMedications(List<Medication> medications) async {
   SharedPreferences prefs = await SharedPreferences.getInstance();
   List<String> medsJson =
@@ -105,7 +161,7 @@ Future<void> saveMedications(List<Medication> medications) async {
   await prefs.setStringList('medications', medsJson);
 }
 
-//Loads medications from local storage
+///Loads medications from local storage
 Future<List<Medication>> loadMedications() async {
   SharedPreferences prefs = await SharedPreferences.getInstance();
   List<String>? jsonList = prefs.getStringList('medications');
@@ -122,7 +178,7 @@ Future<List<Medication>> loadMedications() async {
   return [];
 }
 
-//Helps manage the list of medications
+///A provider class for managing medications
 class MedicationProvider with ChangeNotifier {
   final List<Medication> _medications = [];
   List<Medication> get medications => _medications;

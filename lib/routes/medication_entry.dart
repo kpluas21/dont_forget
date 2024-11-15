@@ -1,6 +1,5 @@
 import 'package:dont_forget/main.dart';
 import 'package:dont_forget/models/medication.dart';
-import 'package:dont_forget/util/helper_funcs.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:dont_forget/util/confirm_dialog.dart';
@@ -201,7 +200,7 @@ class _MedicationEntryState extends State<MedicationEntry> {
                       .map((MeasurementUnit unit) =>
                           DropdownMenuItem<MeasurementUnit>(
                             value: unit,
-                            child: Text(getEnumValueString(unit)),
+                            child: Text(unit.displayString),
                           ))
                       .toList(),
                 ),
@@ -217,7 +216,7 @@ class _MedicationEntryState extends State<MedicationEntry> {
                   items: frequencies
                       .map((Frequency freq) => DropdownMenuItem<Frequency>(
                             value: freq,
-                            child: Text(getEnumValueString(freq)),
+                            child: Text(freq.displayString),
                           ))
                       .toList(),
                 ),
@@ -233,7 +232,7 @@ class _MedicationEntryState extends State<MedicationEntry> {
                   items: types
                       .map((MedicationType type) => DropdownMenuItem(
                             value: type,
-                            child: Text(getEnumValueString(type)),
+                            child: Text(type.displayString),
                           ))
                       .toList(),
                 ),
