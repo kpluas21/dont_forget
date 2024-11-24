@@ -153,9 +153,9 @@ class _HomePageState extends State<HomePage> {
                           '${med.count} x ${med.name} - ${med.dose} ${med.unit.displayString}'),
                       subtitle: kDebugMode
                           ? Text(
-                              '${med.frequencyString} - Next reminder at ${med.nextReminderDateString} - Notification ID: ${med.notificationId}')
+                              '${med.frequency.displayString} - Next reminder at ${med.nextReminderDateString} - Notification ID: ${med.notificationId}')
                           : Text(
-                              '${med.frequencyString} - Next reminder at ${med.nextReminderDateString}'),
+                              '${med.frequency.displayString} - Next reminder at ${med.nextReminderDateString}'),
                     );
                   },
                   separatorBuilder: (context, index) => SizedBox(

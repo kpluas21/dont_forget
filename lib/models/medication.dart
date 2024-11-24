@@ -106,9 +106,7 @@ class Medication {
   int count = 1;
   int? notificationId;
 
-  String get typeString => type.toString().split('.').last;
-  String get frequencyString => frequency.toString().split('.').last;
-  String get unitString => unit.toString().split('.').last;
+
   String get nextReminderDateString => nextReminderDate != null
       ? formatter.format(nextReminderDate!)
       : 'No reminder set';
@@ -118,15 +116,15 @@ class Medication {
 
   @override
   String toString() {
-    return '$name($typeString) - $count of $dose $unitString taken $frequencyString';
+    return '$name(${type.displayString}) - $count of $dose ${unit.displayString} taken ${frequency.displayString} - Next reminder at $nextReminderDate';
   }
 
   Map<String, dynamic> toJSON() {
     return {
-      'type': typeString,
+      'type': type.displayString,
       'name': name,
-      'frequency': frequencyString,
-      'unit': unitString,
+      'frequency': frequency.displayString,
+      'unit': unit.displayString,
       'dose': dose,
       'count': count,
       'nextReminderDate': nextReminderDate?.toIso8601String(),
@@ -137,12 +135,12 @@ class Medication {
   factory Medication.fromJSON(Map<String, dynamic> json) {
     return Medication(
       MedicationType.values.firstWhere(
-          (type) => type.toString().split('.').last == json['type']),
+          (type) => type.displayString == json['type']),
       json['name'],
       Frequency.values.firstWhere(
-          (freq) => freq.toString().split('.').last == json['frequency']),
+          (freq) => freq.displayString == json['frequency']),
       MeasurementUnit.values.firstWhere(
-          (unit) => unit.toString().split('.').last == json['unit']),
+          (unit) => unit.displayString == json['unit']),
       json['dose'],
       json['count'] ?? 1,
       json['nextReminderDate'] != null

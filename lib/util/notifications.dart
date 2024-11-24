@@ -4,6 +4,16 @@ import 'package:timezone/timezone.dart' as tz;
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'package:flutter_timezone/flutter_timezone.dart';
 
+///A class that pairs two notification ids together
+/// oneTime: For the initial reminder
+/// recurring: For the recurring reminders based on the frequency provided.
+class NotificationIdPair<T1, T2> {
+  int? oneTime;
+  int? recurring;
+
+  NotificationIdPair({this.oneTime, this.recurring});
+}
+
 class LocalNotificationService with ChangeNotifier {
   final List<int> _notifications = [];
   List<int> get notifications => _notifications;
@@ -23,11 +33,10 @@ class LocalNotificationService with ChangeNotifier {
     // Initialize the timezone
     tz.initializeTimeZones();
     final String currentTimeZone = await FlutterTimezone.getLocalTimezone();
-    if(kDebugMode) {
+    if (kDebugMode) {
       print('Current timezone: $currentTimeZone');
     }
     tz.setLocalLocation(tz.getLocation(currentTimeZone));
-
 
     // Request permissions for Android
     flutterLocalNotificationsPlugin
@@ -48,6 +57,8 @@ class LocalNotificationService with ChangeNotifier {
   }
 
   // Schedule a notification for a specific time
+  /// Once the first notification finishes, the next notification will be scheduled
+  /// on a recurring basis
   Future<void> scheduleNotificationAndroid(int notificationId, String title,
       String value, DateTime scheduledTime) async {
     NotificationDetails notificationDetails =
@@ -57,25 +68,43 @@ class LocalNotificationService with ChangeNotifier {
     final tz.TZDateTime tzScheduledTime =
         tz.TZDateTime.from(scheduledTime, tz.local);
 
-    if(kDebugMode) {
+    if (kDebugMode) {
       print('Scheduled time: $scheduledTime');
       print('tzScheduled time: $tzScheduledTime');
     }
 
-    
-
     // Schedule the notification
     await flutterLocalNotificationsPlugin.zonedSchedule(
-        notificationId, 
-        title, 
-        value, 
-        tzScheduledTime, 
-        notificationDetails,
+        notificationId, title, value, tzScheduledTime, notificationDetails,
         androidScheduleMode: AndroidScheduleMode.exactAllowWhileIdle,
         uiLocalNotificationDateInterpretation:
             UILocalNotificationDateInterpretation.absoluteTime,
         payload: 'item x');
   }
+
+  Future<void> _scheduleNotificationAndroid(int notificationId, String title,
+      String value, DateTime scheduledTime) async {
+    NotificationDetails notificationDetails =
+        NotificationDetails(android: androidNotificationDetails);
+
+    //Given a DateTime, convert it to a TZDateTime that is in the local timezone.
+    final tz.TZDateTime tzScheduledTime =
+        tz.TZDateTime.from(scheduledTime, tz.local);
+
+    if (kDebugMode) {
+      print('Scheduled time: $scheduledTime');
+      print('tzScheduled time: $tzScheduledTime');
+    }
+
+    // Schedule the notification
+    await flutterLocalNotificationsPlugin.zonedSchedule(
+        notificationId, title, value, tzScheduledTime, notificationDetails,
+        androidScheduleMode: AndroidScheduleMode.exactAllowWhileIdle,
+        uiLocalNotificationDateInterpretation:
+            UILocalNotificationDateInterpretation.absoluteTime,
+        payload: 'item x');
+  }
+
 
   int _generateNotificationId() {
     int id;
@@ -83,12 +112,7 @@ class LocalNotificationService with ChangeNotifier {
     return id;
   }
 
-  void cancelAllNotifications() async {
-    await flutterLocalNotificationsPlugin.cancelAll();
-    _notifications.clear();
-    notifyListeners();
-  }
-
+ 
   // Adds a notification id to the list
   // Schedules a notification for a specific time
   int addNotifications(DateTime scheduledTime) {
@@ -105,6 +129,12 @@ class LocalNotificationService with ChangeNotifier {
     await flutterLocalNotificationsPlugin.cancel(notificationId);
     notifyListeners();
   }
+ void cancelAllNotifications() async {
+    await flutterLocalNotificationsPlugin.cancelAll();
+    _notifications.clear();
+    notifyListeners();
+  }
+
 
   Future<List<PendingNotificationRequest>> getPendingNotifications() async {
     final List<PendingNotificationRequest> pendingNotificationRequests =
@@ -123,4 +153,3 @@ class LocalNotificationService with ChangeNotifier {
     }
   }
 }
-
