@@ -4,16 +4,6 @@ import 'package:timezone/timezone.dart' as tz;
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'package:flutter_timezone/flutter_timezone.dart';
 
-///A class that pairs two notification ids together
-/// oneTime: For the initial reminder
-/// recurring: For the recurring reminders based on the frequency provided.
-class NotificationIdPair<T1, T2> {
-  int? oneTime;
-  int? recurring;
-
-  NotificationIdPair({this.oneTime, this.recurring});
-}
-
 class LocalNotificationService with ChangeNotifier {
   final List<int> _notifications = [];
   List<int> get notifications => _notifications;

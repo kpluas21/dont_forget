@@ -105,7 +105,7 @@ class Medication {
   double dose;
   int count = 1;
   int? notificationId;
-
+  int? nextNotificationId;
 
   String get nextReminderDateString => nextReminderDate != null
       ? formatter.format(nextReminderDate!)
