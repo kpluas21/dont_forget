@@ -4,6 +4,7 @@ import 'package:timezone/timezone.dart' as tz;
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'package:flutter_timezone/flutter_timezone.dart';
 
+// This service handles local notifications for medication reminders
 class LocalNotificationService with ChangeNotifier {
   final List<int> _notifications = [];
   List<int> get notifications => _notifications;
@@ -67,8 +68,6 @@ class LocalNotificationService with ChangeNotifier {
     await flutterLocalNotificationsPlugin.zonedSchedule(
         notificationId, title, value, tzScheduledTime, notificationDetails,
         androidScheduleMode: AndroidScheduleMode.exactAllowWhileIdle,
-        uiLocalNotificationDateInterpretation:
-            UILocalNotificationDateInterpretation.absoluteTime,
         payload: 'item x');
   }
 
@@ -90,8 +89,6 @@ class LocalNotificationService with ChangeNotifier {
     await flutterLocalNotificationsPlugin.zonedSchedule(
         notificationId, title, value, tzScheduledTime, notificationDetails,
         androidScheduleMode: AndroidScheduleMode.exactAllowWhileIdle,
-        uiLocalNotificationDateInterpretation:
-            UILocalNotificationDateInterpretation.absoluteTime,
         payload: 'item x');
   }
 

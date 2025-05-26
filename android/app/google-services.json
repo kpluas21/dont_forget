@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "934001225549",
+    "project_id": "dontforgetdev-986d7",
+    "storage_bucket": "dontforgetdev-986d7.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:934001225549:android:78c02577230a2ae0121104",
+        "android_client_info": {
+          "package_name": "com.example.dont_forget"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyAs1VmAM4oQylJJ1z8QlScQ_wj_wALtjbE"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
